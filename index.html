@@ -35,20 +35,20 @@
     <!-- 費用明細卡片 (上課費用 & 場地費用) -->
     <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5">
       <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center">
-        <span>💰 課程費用與帳務明細</span>
+        <span>💰 課程費用明細</span>
       </h3>
       <div class="space-y-2 text-sm">
         <div class="flex justify-between text-gray-600">
-          <span>🎓 上課費用（教練費）</span>
-          <span class="font-semibold text-gray-800">NT\$ <span id="courseFee">0</span></span>
+          <span>🎓 教練費</span>
+          <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
         </div>
         <div class="flex justify-between text-gray-600">
-          <span>🏋️‍♂️ 場地費用（租場費）</span>
-          <span class="font-semibold text-gray-800">NT\$ <span id="venueFee">0</span></span>
+          <span>🏋️‍♂️ 租場費</span>
+          <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
         </div>
         <div class="border-t border-gray-200 pt-2 flex justify-between font-bold text-gray-900 text-base">
           <span>合計總費用</span>
-          <span class="text-green-700">NT\$ <span id="totalFee">0</span></span>
+          <span class="text-green-700">NT <span id="totalFee">0</span></span>
         </div>
       </div>
     </div>
@@ -56,7 +56,7 @@
     <!-- 可約時段列表 -->
     <div class="mb-2">
       <h2 class="font-bold text-gray-800 text-base mb-1">請選擇可預約時段：</h2>
-      <p class="text-xs text-gray-400 mb-3">點選時段後即自動完成核銷與預約</p>
+      <p class="text-xs text-gray-400 mb-3">時段確認後即自動完成預約與扣課</p>
       <div id="slotList" class="space-y-2">
         <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-400 text-sm">時段載入中...</div>
       </div>
@@ -166,7 +166,7 @@
           if (liff.isLoggedIn() && liff.isInClient()) {
             await liff.sendMessages([{
               type: 'text',
-              text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！`
+              text: `🤖 ${slotId}教練，我已預約了 ${timeText} 的課程！`
             }]);
           }
           liff.closeWindow();
