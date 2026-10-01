@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>教練端學員管理後台</title>
+  <!-- LINE LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- Tailwind CSS 樣式庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8">
@@ -12,11 +15,11 @@
     <!-- 頂部標題與重新整理 -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">🏋️️‍♂️ 教練端學員管理後台</h1>
+        <h1 class="text-2xl font-bold text-gray-800">🏋‍♂️ 教練端學員管理後台</h1>
         <p class="text-xs text-gray-500 mt-1">即時檢視學員堂數、費用明細與 LINE LIFF 連結</p>
       </div>
-      <button onclick="loadStudents()" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold py-2 px-4 border border-gray-300 rounded-xl shadow-sm transition">
-        🔄 重新整理
+      <button onclick="loadStudents()" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold py-2 px-4 border border-gray-300 rounded-xl shadow-sm transition flex items-center space-x-1">
+        <span>🔄 重新整理</span>
       </button>
     </div>
 
@@ -38,7 +41,7 @@
 
     <!-- 快速新增學員摺疊區塊 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-      <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center cursor-pointer" onclick="toggleAddForm()">
+      <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center cursor-pointer select-none" onclick="toggleAddForm()">
         <h2 class="font-bold text-gray-700 text-sm">➕ 快速新增學員</h2>
         <span id="formToggleIcon" class="text-gray-400 text-xs">展開 ▼</span>
       </div>
@@ -50,7 +53,7 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">專屬 Token (驗證碼) *</label>
-            <input type="text" id="newToken" placeholder="可留空自動生成或填手機號碼" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="text" id="newToken" placeholder="可留空自動生成或填手機號碼/ID" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">購買總堂數</label>
@@ -78,7 +81,7 @@
     <!-- 學員名冊搜尋與列表 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-        <h2 class="font-bold text-gray-800 text-lg">👥 學員名冊與 LIFF 專屬連結</h2>
+        <h2 class="font-bold text-gray-800 text-lg">👥 學員名冊與約課連結</h2>
         <input type="text" id="searchInput" oninput="filterStudents()" placeholder="🔍 搜尋學員姓名..." class="w-full md:w-64 border border-gray-300 rounded-xl p-2 text-sm outline-none focus:ring-2 focus:ring-green-500">
       </div>
 
@@ -91,13 +94,32 @@
   </div>
 
   <script>
+    // ⚙️ 新更新的教練端設定 (Credentials)
+    const COACH_LIFF_ID = "2011823687-xpS0rFgS"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzmep31XXtf-5eG5lHh5rUNXzn_LMkJphoyom8mqHgGJB8AEEFRauVh-V4uuQkdPMPG/exec";
-    const LIFF_BASE_URL = "https://liff.line.me/2011823687-xpS0rFgS";
+    
+    // 學生端約課的專屬 LIFF 網址基地
+    const STUDENT_LIFF_BASE_URL = "https://liff.line.me/2011814195-BxeoylZA";
 
     let allStudents = [];
 
-    // 載入全體學員
+    // 初始化 LIFF 並讀取資料
+    async function init() {
+      try {
+        if (window.liff) {
+          await liff.init({ liffId: COACH_LIFF_ID });
+        }
+      } catch (err) {
+        console.warn("LIFF 初始化警告:", err);
+      }
+      loadStudents();
+    }
+
+    // 載入全體學員資料
     async function loadStudents() {
+      const container = document.getElementById('studentListContainer');
+      container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">載入學員資料中...</div>';
+
       try {
         const res = await fetch(`${GAS_URL}?action=getCoachStudents`);
         const data = await res.json();
@@ -106,15 +128,15 @@
           renderDashboard(allStudents);
           renderStudentCards(allStudents);
         } else {
-          document.getElementById('studentListContainer').innerHTML = '<p class="text-red-500 text-sm py-4">無法載入學員資料</p>';
+          container.innerHTML = `<p class="text-red-500 text-sm py-4 text-center">無法載入資料：${data.message || '未知錯誤'}</p>`;
         }
       } catch (e) {
-        console.error(e);
-        document.getElementById('studentListContainer').innerHTML = '<p class="text-red-500 text-sm py-4">網路連線異常，請重新整理</p>';
+        console.error("無法連線至 GAS:", e);
+        container.innerHTML = '<p class="text-red-500 text-sm py-4 text-center">網路連線異常，請確認 GAS 部署權限或重新整理。</p>';
       }
     }
 
-    // 更新頂部數據統計
+    // 渲染儀表板數據
     function renderDashboard(students) {
       document.getElementById('statStudentCount').innerText = students.length;
       
@@ -125,7 +147,7 @@
       document.getElementById('statTotalRevenue').innerText = totalRevenue.toLocaleString();
     }
 
-    // 渲染學員卡片列表
+    // 渲染學員名冊卡片
     function renderStudentCards(students) {
       const container = document.getElementById('studentListContainer');
       container.innerHTML = '';
@@ -139,7 +161,8 @@
         const total = Number(student.total) || 1;
         const remaining = Number(student.remaining) || 0;
         const percent = Math.min(Math.round((remaining / total) * 100), 100);
-        const liffLink = `${LIFF_BASE_URL}?token=${encodeURIComponent(student.token)}`;
+        // 自動生成帶有該學生專屬 Token 的學生端 LIFF 連結
+        const studentLiffLink = `${STUDENT_LIFF_BASE_URL}?token=${encodeURIComponent(student.token)}`;
         const totalFee = (Number(student.courseFee) || 0) + (Number(student.venueFee) || 0);
 
         const card = document.createElement('div');
@@ -171,8 +194,8 @@
               場地費: <span class="font-semibold text-gray-800">\$${Number(student.venueFee).toLocaleString()}</span> 
               <span class="font-bold text-green-700 ml-1">(總計: \$${totalFee.toLocaleString()})</span>
             </div>
-            <button onclick="copyLiffLink('${liffLink}', '${student.name}')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs flex items-center justify-center space-x-1">
-              <span>📋 複製專屬 LIFF 連結</span>
+            <button onclick="copyLiffLink('${studentLiffLink}', '${student.name}')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs flex items-center justify-center space-x-1">
+              <span>📋 複製專屬約課連結</span>
             </button>
           </div>
         `;
@@ -180,23 +203,27 @@
       });
     }
 
-    // 搜尋學員
+    // 搜尋過濾學員
     function filterStudents() {
       const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
       const filtered = allStudents.filter(s => s.name.toLowerCase().includes(keyword) || String(s.token).toLowerCase().includes(keyword));
       renderStudentCards(filtered);
     }
 
-    // 一鍵複製 LIFF 連結
+    // 一鍵複製學生約課連結
     function copyLiffLink(link, name) {
-      navigator.clipboard.writeText(link).then(() => {
-        alert(`已成功複製【${name}】的專屬 LINE 約課連結！\n可以直接貼到與學員的 LINE 私人對話框並提醒置頂囉！`);
-      }).catch(err => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(() => {
+          alert(`已成功複製【${name}】的專屬 LINE 約課連結！\n可以直接貼到與學員的 LINE 私人對話框囉！`);
+        }).catch(() => {
+          prompt("請手動複製以下連結：", link);
+        });
+      } else {
         prompt("請手動複製以下連結：", link);
-      });
+      }
     }
 
-    // 切換新增學員表單
+    // 折疊/展開新增表單
     function toggleAddForm() {
       const form = document.getElementById('addStudentForm');
       const icon = document.getElementById('formToggleIcon');
@@ -246,7 +273,7 @@
           document.getElementById('newName').value = '';
           document.getElementById('newToken').value = '';
           toggleAddForm();
-          loadStudents(); // 重新載入列表
+          loadStudents();
         } else {
           alert("❌ 新增失敗：" + result.message);
         }
@@ -255,7 +282,7 @@
       }
     }
 
-    loadStudents();
+    init();
   </script>
 </body>
 </html>
