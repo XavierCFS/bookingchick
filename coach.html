@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>教練端學員管理後台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- 頂部標題與重新整理 -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">🏋️️‍♂️ 教練端學員管理後台</h1>
+        <p class="text-xs text-gray-500 mt-1">即時檢視學員堂數、費用明細與 LINE LIFF 連結</p>
+      </div>
+      <button onclick="loadStudents()" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold py-2 px-4 border border-gray-300 rounded-xl shadow-sm transition">
+        🔄 重新整理
+      </button>
+    </div>
+
+    <!-- 數據概覽儀表板 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">總學員人數</span>
+        <div class="text-3xl font-black text-gray-800 mt-1" id="statStudentCount">--</div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+        <span class="text-xs font-bold text-green-600 uppercase tracking-wider">總剩餘堂數</span>
+        <div class="text-3xl font-black text-green-600 mt-1" id="statRemainingLessons">-- <span class="text-sm font-normal text-gray-400">堂</span></div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">總預收費用 (上課+場地)</span>
+        <div class="text-2xl font-black text-blue-600 mt-1">NT\$ <span id="statTotalRevenue">0</span></div>
+      </div>
+    </div>
+
+    <!-- 快速新增學員摺疊區塊 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
+      <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center cursor-pointer" onclick="toggleAddForm()">
+        <h2 class="font-bold text-gray-700 text-sm">➕ 快速新增學員</h2>
+        <span id="formToggleIcon" class="text-gray-400 text-xs">展開 ▼</span>
+      </div>
+      <div id="addStudentForm" class="hidden p-5 border-t border-gray-100">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">學員姓名 *</label>
+            <input type="text" id="newName" placeholder="例如：林小美" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">專屬 Token (驗證碼) *</label>
+            <input type="text" id="newToken" placeholder="可留空自動生成或填手機號碼" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">購買總堂數</label>
+            <input type="number" id="newTotal" value="10" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">初始剩餘堂數</label>
+            <input type="number" id="newRemaining" value="10" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">上課費用 (NT\$)</label>
+            <input type="number" id="newCourseFee" placeholder="15000" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">場地費用 (NT\$)</label>
+            <input type="number" id="newVenueFee" placeholder="2000" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+          </div>
+        </div>
+        <button onclick="submitNewStudent()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition">
+          確認新增學員並寫入試算表
+        </button>
+      </div>
+    </div>
+
+    <!-- 學員名冊搜尋與列表 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+        <h2 class="font-bold text-gray-800 text-lg">👥 學員名冊與 LIFF 專屬連結</h2>
+        <input type="text" id="searchInput" oninput="filterStudents()" placeholder="🔍 搜尋學員姓名..." class="w-full md:w-64 border border-gray-300 rounded-xl p-2 text-sm outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <!-- 學員卡片列表容器 -->
+      <div id="studentListContainer" class="space-y-4">
+        <div class="text-center py-8 text-gray-400 text-sm">載入學員資料中...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby3lgINctsdKYrPBOLVt3GtGd8dtj4-0-0Q8K3iSlK9fvulWJIMW3bjoUDyfJAgKgXm/exec";
+    const LIFF_BASE_URL = "https://liff.line.me/2011814195-BxeoylZA";
+
+    let allStudents = [];
+
+    // 載入全體學員
+    async function loadStudents() {
+      try {
+        const res = await fetch(`${GAS_URL}?action=getCoachStudents`);
+        const data = await res.json();
+        if (data.success) {
+          allStudents = data.students || [];
+          renderDashboard(allStudents);
+          renderStudentCards(allStudents);
+        } else {
+          document.getElementById('studentListContainer').innerHTML = '<p class="text-red-500 text-sm py-4">無法載入學員資料</p>';
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById('studentListContainer').innerHTML = '<p class="text-red-500 text-sm py-4">網路連線異常，請重新整理</p>';
+      }
+    }
+
+    // 更新頂部數據統計
+    function renderDashboard(students) {
+      document.getElementById('statStudentCount').innerText = students.length;
+      
+      const totalRemaining = students.reduce((sum, s) => sum + (Number(s.remaining) || 0), 0);
+      document.getElementById('statRemainingLessons').innerText = totalRemaining;
+
+      const totalRevenue = students.reduce((sum, s) => sum + (Number(s.courseFee) || 0) + (Number(s.venueFee) || 0), 0);
+      document.getElementById('statTotalRevenue').innerText = totalRevenue.toLocaleString();
+    }
+
+    // 渲染學員卡片列表
+    function renderStudentCards(students) {
+      const container = document.getElementById('studentListContainer');
+      container.innerHTML = '';
+
+      if (students.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-sm py-6 text-center">目前尚無學員資料。</p>';
+        return;
+      }
+
+      students.forEach(student => {
+        const total = Number(student.total) || 1;
+        const remaining = Number(student.remaining) || 0;
+        const percent = Math.min(Math.round((remaining / total) * 100), 100);
+        const liffLink = `${LIFF_BASE_URL}?token=${encodeURIComponent(student.token)}`;
+        const totalFee = (Number(student.courseFee) || 0) + (Number(student.venueFee) || 0);
+
+        const card = document.createElement('div');
+        card.className = "border border-gray-200 rounded-xl p-4 hover:border-green-300 transition shadow-sm bg-white";
+        card.innerHTML = `
+          <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 border-b border-gray-100 pb-3 mb-3">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="text-lg font-bold text-gray-800">${student.name}</span>
+                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">ID: ${student.studentId}</span>
+              </div>
+              <div class="text-xs text-gray-400 mt-0.5">Token: <code class="bg-gray-50 px-1 py-0.5 rounded">${student.token}</code></div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-gray-500">剩餘 / 總堂數</span>
+              <div class="text-lg font-black text-green-700">${remaining} / ${total} <span class="text-xs font-normal text-gray-500">堂</span></div>
+            </div>
+          </div>
+
+          <!-- 堂數進度條 -->
+          <div class="w-full bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
+            <div class="bg-green-500 h-2 rounded-full" style="width: ${percent}%"></div>
+          </div>
+
+          <!-- 費用與複製按鈕區 -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs text-gray-600 bg-gray-50 p-2.5 rounded-lg">
+            <div>
+              上課費: <span class="font-semibold text-gray-800">\$${Number(student.courseFee).toLocaleString()}</span> | 
+              場地費: <span class="font-semibold text-gray-800">\$${Number(student.venueFee).toLocaleString()}</span> 
+              <span class="font-bold text-green-700 ml-1">(總計: \$${totalFee.toLocaleString()})</span>
+            </div>
+            <button onclick="copyLiffLink('${liffLink}', '${student.name}')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs flex items-center justify-center space-x-1">
+              <span>📋 複製專屬 LIFF 連結</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 搜尋學員
+    function filterStudents() {
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filtered = allStudents.filter(s => s.name.toLowerCase().includes(keyword) || String(s.token).toLowerCase().includes(keyword));
+      renderStudentCards(filtered);
+    }
+
+    // 一鍵複製 LIFF 連結
+    function copyLiffLink(link, name) {
+      navigator.clipboard.writeText(link).then(() => {
+        alert(`已成功複製【${name}】的專屬 LINE 約課連結！\n可以直接貼到與學員的 LINE 私人對話框並提醒置頂囉！`);
+      }).catch(err => {
+        prompt("請手動複製以下連結：", link);
+      });
+    }
+
+    // 切換新增學員表單
+    function toggleAddForm() {
+      const form = document.getElementById('addStudentForm');
+      const icon = document.getElementById('formToggleIcon');
+      if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        icon.innerText = '收合 ▲';
+      } else {
+        form.classList.add('hidden');
+        icon.innerText = '展開 ▼';
+      }
+    }
+
+    // 送出新增學員
+    async function submitNewStudent() {
+      const name = document.getElementById('newName').value.trim();
+      let token = document.getElementById('newToken').value.trim();
+      const total = document.getElementById('newTotal').value;
+      const remaining = document.getElementById('newRemaining').value;
+      const courseFee = document.getElementById('newCourseFee').value;
+      const venueFee = document.getElementById('newVenueFee').value;
+
+      if (!name) {
+        alert("請填寫學員姓名！");
+        return;
+      }
+
+      if (!token) {
+        token = 'tk_' + Math.floor(Math.random() * 1000000);
+      }
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'addStudent',
+            name: name,
+            token: token,
+            total: total,
+            remaining: remaining,
+            courseFee: courseFee,
+            venueFee: venueFee
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert("🎉 學員新增成功！");
+          document.getElementById('newName').value = '';
+          document.getElementById('newToken').value = '';
+          toggleAddForm();
+          loadStudents(); // 重新載入列表
+        } else {
+          alert("❌ 新增失敗：" + result.message);
+        }
+      } catch (e) {
+        alert("網路錯誤，請重試");
+      }
+    }
+
+    loadStudents();
+  </script>
+</body>
+</html>
