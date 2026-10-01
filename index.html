@@ -3,91 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>預約中心</title>
+  <title>學員預約中心</title>
+  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- Tailwind CSS 樣式庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-4">
-  <div id="app" class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+<body class="bg-gray-100 min-h-screen p-4">
+  <div id="app" class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
     <!-- 學員資料卡片 -->
-    <div class="border-b pb-4 mb-4">
-      <h1 class="text-xl font-bold text-gray-800" id="studentName">載入中...</h1>
-      <p class="text-sm text-gray-500 mt-1">剩餘堂數：<span id="remaining" class="text-2xl font-extrabold text-green-600">--</span> 堂</p>
+    <div class="border-b pb-4 mb-5">
+      <div class="flex justify-between items-center">
+        <h1 class="text-xl font-bold text-gray-800" id="studentName">載入中...</h1>
+        <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 已連線</span>
+      </div>
+      <div class="mt-3 bg-green-50 p-3 rounded-xl flex justify-between items-center border border-green-100">
+        <span class="text-sm font-medium text-gray-600">剩餘課程堂數</span>
+        <span class="text-2xl font-black text-green-600"><span id="remaining">--</span> 堂</span>
+      </div>
     </div>
 
     <!-- 可約時段列表 -->
-    <h2 class="font-bold text-gray-700 mb-2">請選擇可預約時段：</h2>
-    <div id="slotList" class="space-y-2 mb-6">
-      <p class="text-gray-400 text-sm">搜尋時段中...</p>
+    <div class="mb-4">
+      <h2 class="font-bold text-gray-700 text-base mb-1">請選擇可預約時段：</h2>
+      <p class="text-xs text-gray-400 mb-3">點擊開放時段即可完成排課與核銷</p>
+      <div id="slotList" class="space-y-2">
+        <div class="animate-pulse flex space-x-4 p-4 bg-gray-50 rounded-lg">
+          <div class="flex-1 space-y-2 py-1">
+            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const LIFF_ID = "YOUR_LIFF_ID"; // 替換為你的 LIFF ID
-    const GAS_URL = "YOUR_GAS_WEB_APP_URL"; // 替換為你的 GAS 部署 URL
+    // 嵌入的 Credentials 設定
+    const LIFF_ID = "2011814195-BxeoylZA"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby3lgINctsdKYrPBOLVt3GtGd8dtj4-0-0Q8K3iSlK9fvulWJIMW3bjoUDyfJAgKgXm/exec";
 
     // 取得 URL 網址參數 (token)
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
     async function init() {
-      await liff.init({ liffId: LIFF_ID });
-      if (!token) {
-        alert("無效的學員連結");
-        return;
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        if (!token) {
+          document.getElementById('studentName').innerText = "⚠️ 連結無效";
+          document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm">請透過教練傳送的專屬連結開啟預約頁面。</p>';
+          return;
+        }
+        await loadStudentData();
+        await loadSlots();
+      } catch (err) {
+        console.error("LIFF 初始化失敗:", err);
+        document.getElementById('studentName').innerText = "系統連線異常";
       }
-      loadStudentData();
-      loadSlots();
     }
 
-    // 載入學員剩餘堂數
+    // 讀取學員剩餘堂數
     async function loadStudentData() {
-      const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('studentName').innerText = `你好，${data.name}！`;
-        document.getElementById('remaining').innerText = data.remaining;
+      try {
+        const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('studentName').innerText = `你好，${data.name}！`;
+          document.getElementById('remaining').innerText = data.remaining;
+        } else {
+          document.getElementById('studentName').innerText = "查無學員資料";
+          document.getElementById('remaining').innerText = "0";
+        }
+      } catch (e) {
+        console.error("無法取得學員資料:", e);
       }
     }
 
-    // 載入可約時段
+    // 讀取開放預約時段
     async function loadSlots() {
-      const res = await fetch(`${GAS_URL}?action=getAvailableSlots`);
-      const slots = await res.json();
-      const container = document.getElementById('slotList');
-      container.innerHTML = '';
-      
-      slots.forEach(slot => {
-        const btn = document.createElement('button');
-        btn.className = "w-full bg-green-50 hover:bg-green-100 text-green-700 border border-green-300 font-semibold py-2 px-4 rounded-lg flex justify-between items-center";
-        btn.innerHTML = `<span>${slot.date} ${slot.time}</span> <span class="text-xs bg-green-500 text-white px-2 py-1 rounded">可預約</span>`;
-        btn.onclick = () => book(slot.slotId, `${slot.date} ${slot.time}`);
-        container.appendChild(btn);
-      });
+      try {
+        const res = await fetch(`${GAS_URL}?action=getAvailableSlots`);
+        const slots = await res.json();
+        const container = document.getElementById('slotList');
+        container.innerHTML = '';
+        
+        if (!slots || slots.length === 0) {
+          container.innerHTML = '<p class="text-gray-400 text-sm py-4 text-center">目前無開放預約時段，請聯繫教練。</p>';
+          return;
+        }
+
+        slots.forEach(slot => {
+          const btn = document.createElement('button');
+          btn.className = "w-full bg-white hover:bg-green-50 text-gray-800 border border-gray-200 hover:border-green-400 font-semibold py-3 px-4 rounded-xl flex justify-between items-center shadow-sm transition duration-150";
+          btn.innerHTML = `
+            <div class="flex items-center space-x-2">
+              <span class="text-green-600">📅</span>
+              <span>${slot.date} ${slot.time}</span>
+            </div>
+            <span class="text-xs bg-green-500 text-white font-medium px-2.5 py-1 rounded-full">預約</span>
+          `;
+          btn.onclick = () => book(slot.slotId, `${slot.date} ${slot.time}`);
+          container.appendChild(btn);
+        });
+      } catch (e) {
+        console.error("無法載入時段:", e);
+        document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm">載入時段失敗，請稍後重試。</p>';
+      }
     }
 
-    // 點擊預約
+    // 執行預約並於 LINE 聊天室帶出訊息
     async function book(slotId, timeText) {
       if (!confirm(`確定要預約 ${timeText} 嗎？`)) return;
 
-      const res = await fetch(GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'bookSlot', token: token, slotId: slotId })
-      });
-      const result = await res.json();
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'bookSlot', token: token, slotId: slotId })
+        });
+        const result = await res.json();
 
-      if (result.success) {
-        alert("預約成功！");
-        // 自動在私人 LINE 聊天室發送預約紀錄訊息
-        if (liff.isLoggedIn() && liff.isInClient()) {
-          await liff.sendMessages([{
-            type: 'text',
-            text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！`
-          }]);
+        if (result.success) {
+          alert("🎉 預約成功！");
+          
+          // 自動在私人 LINE 聊天室帶出訊息
+          if (liff.isLoggedIn() && liff.isInClient()) {
+            await liff.sendMessages([{
+              type: 'text',
+              text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！`
+            }]);
+          }
+          liff.closeWindow(); // 自動關閉 LIFF 頁面
+        } else {
+          alert(`❌ 預約失敗：${result.message}`);
         }
-        liff.closeWindow(); // 自動關閉 LIFF
-      } else {
-        alert(result.message);
+      } catch (e) {
+        alert("網路連線錯誤，請重試");
       }
     }
 
