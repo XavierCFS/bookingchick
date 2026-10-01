@@ -4,45 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>學員預約中心</title>
-  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <!-- Tailwind CSS 樣式庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
   <div id="app" class="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
-    <!-- 學員資料卡片 -->
-    <div class="border-b pb-4 mb-5">
-      <div class="flex justify-between items-center">
-        <h1 class="text-xl font-bold text-gray-800" id="studentName">載入中...</h1>
-        <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 已連線</span>
+    
+    <!-- 學員姓名與連線狀態 -->
+    <div class="flex justify-between items-center border-b pb-3 mb-4">
+      <h1 class="text-xl font-bold text-gray-800" id="studentName">載入中...</h1>
+      <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
+    </div>
+
+    <!-- 堂數資訊卡片 (顯示 剩餘堂數 / 總堂數) -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl border border-green-100 mb-4 shadow-sm">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-xs font-semibold text-green-800 uppercase tracking-wider">課程包使用進度</span>
+        <span class="text-xs font-bold text-green-600" id="lessonPercentage">--%</span>
       </div>
-      <div class="mt-3 bg-green-50 p-3 rounded-xl flex justify-between items-center border border-green-100">
-        <span class="text-sm font-medium text-gray-600">剩餘課程堂數</span>
-        <span class="text-2xl font-black text-green-600"><span id="remaining">--</span> 堂</span>
+      <div class="flex justify-between items-baseline mb-2">
+        <span class="text-sm font-medium text-gray-600">剩餘堂數 / 總堂數</span>
+        <span class="text-2xl font-black text-green-700"><span id="remaining">--</span> / <span id="total">--</span> <span class="text-sm font-normal text-gray-500">堂</span></span>
+      </div>
+      <!-- 堂數條狀示意圖 -->
+      <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+        <div id="progressBar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- 費用明細卡片 (上課費用 & 場地費用) -->
+    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5">
+      <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center">
+        <span>💰 課程費用與帳務明細</span>
+      </h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between text-gray-600">
+          <span>🎓 上課費用（教練費）</span>
+          <span class="font-semibold text-gray-800">NT\$ <span id="courseFee">0</span></span>
+        </div>
+        <div class="flex justify-between text-gray-600">
+          <span>🏋️‍♂️ 場地費用（租場費）</span>
+          <span class="font-semibold text-gray-800">NT\$ <span id="venueFee">0</span></span>
+        </div>
+        <div class="border-t border-gray-200 pt-2 flex justify-between font-bold text-gray-900 text-base">
+          <span>合計總費用</span>
+          <span class="text-green-700">NT\$ <span id="totalFee">0</span></span>
+        </div>
       </div>
     </div>
 
     <!-- 可約時段列表 -->
-    <div class="mb-4">
-      <h2 class="font-bold text-gray-700 text-base mb-1">請選擇可預約時段：</h2>
-      <p class="text-xs text-gray-400 mb-3">點擊開放時段即可完成排課與核銷</p>
+    <div class="mb-2">
+      <h2 class="font-bold text-gray-800 text-base mb-1">請選擇可預約時段：</h2>
+      <p class="text-xs text-gray-400 mb-3">點選時段後即自動完成核銷與預約</p>
       <div id="slotList" class="space-y-2">
-        <div class="animate-pulse flex space-x-4 p-4 bg-gray-50 rounded-lg">
-          <div class="flex-1 space-y-2 py-1">
-            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-          </div>
-        </div>
+        <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-400 text-sm">時段載入中...</div>
       </div>
     </div>
+
   </div>
 
   <script>
-    // 嵌入的 Credentials 設定
     const LIFF_ID = "2011814195-BxeoylZA"; 
     const GAS_URL = "https://script.google.com/macros/s/AKfycby3lgINctsdKYrPBOLVt3GtGd8dtj4-0-0Q8K3iSlK9fvulWJIMW3bjoUDyfJAgKgXm/exec";
 
-    // 取得 URL 網址參數 (token)
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
@@ -62,7 +87,7 @@
       }
     }
 
-    // 讀取學員剩餘堂數
+    // 讀取學員資料、堂數與費用明細
     async function loadStudentData() {
       try {
         const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
@@ -70,9 +95,23 @@
         if (data.success) {
           document.getElementById('studentName').innerText = `你好，${data.name}！`;
           document.getElementById('remaining').innerText = data.remaining;
+          document.getElementById('total').innerText = data.total;
+
+          // 計算剩餘進度條 %
+          const total = Number(data.total) || 1;
+          const remaining = Number(data.remaining) || 0;
+          const percent = Math.min(Math.round((remaining / total) * 100), 100);
+          document.getElementById('lessonPercentage').innerText = `${percent}%`;
+          document.getElementById('progressBar').style.width = `${percent}%`;
+
+          // 顯示費用明細
+          const course = Number(data.courseFee) || 0;
+          const venue = Number(data.venueFee) || 0;
+          document.getElementById('courseFee').innerText = course.toLocaleString();
+          document.getElementById('venueFee').innerText = venue.toLocaleString();
+          document.getElementById('totalFee').innerText = (course + venue).toLocaleString();
         } else {
           document.getElementById('studentName').innerText = "查無學員資料";
-          document.getElementById('remaining').innerText = "0";
         }
       } catch (e) {
         console.error("無法取得學員資料:", e);
@@ -124,15 +163,13 @@
 
         if (result.success) {
           alert("🎉 預約成功！");
-          
-          // 自動在私人 LINE 聊天室帶出訊息
           if (liff.isLoggedIn() && liff.isInClient()) {
             await liff.sendMessages([{
               type: 'text',
               text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！`
             }]);
           }
-          liff.closeWindow(); // 自動關閉 LIFF 頁面
+          liff.closeWindow();
         } else {
           alert(`❌ 預約失敗：${result.message}`);
         }
