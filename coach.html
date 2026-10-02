@@ -37,26 +37,35 @@
       </div>
     </div>
 
-    <!-- 今天與近期排課歷程看板 -->
+    <!-- 今天與近期排課歷程看板 (支援一鍵變更上課地點) -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
-      <h2 class="font-bold text-gray-800 text-base mb-3 flex items-center">
-        <span>🗓 近期已預約課程 (今天/明天/未來)</span>
+      <h2 class="font-bold text-gray-800 text-base mb-3 flex items-center justify-between">
+        <span>🗓 近期已預約課程看板</span>
+        <span class="text-xs font-normal text-gray-400">可在此切換確認地點</span>
       </h2>
-      <div id="upcomingBookingList" class="space-y-2 max-h-48 overflow-y-auto">
+      <div id="upcomingBookingList" class="space-y-2 max-h-56 overflow-y-auto">
         <div class="text-center py-4 text-gray-400 text-sm">載入中...</div>
       </div>
     </div>
 
-    <!-- 教練直接幫學員排課區塊 -->
+    <!-- 教練直接幫學員排課區塊 (包含地點選單) -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
       <h2 class="font-bold text-gray-800 text-base mb-2">✍️ 教練直接幫學員排課</h2>
-      <p class="text-xs text-gray-400 mb-4">選取學員與開放時段後自動扣課，並產生 LINE 通知簡訊供複製傳送</p>
+      <p class="text-xs text-gray-400 mb-4">選取學員、地點與開放時段後自動扣課，並同步建立 Google 行事曆</p>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm mb-4">
         <div>
           <label class="block text-xs font-medium text-gray-600 mb-1">選擇學員 *</label>
           <select id="coachSelectStudent" class="w-full border border-gray-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-green-500">
             <option value="">-- 請選擇學員 --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">上課地點 *</label>
+          <select id="coachSelectLocation" class="w-full border border-gray-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-green-500">
+            <option value="賽特體適能中華總店">📍 賽特體適能中華總店</option>
+            <option value="賽特體適能同盟店">📍 賽特體適能同盟店</option>
+            <option value="待教練確認">❓ 待教練確認</option>
           </select>
         </div>
         <div>
@@ -186,9 +195,16 @@
           }
           
           const now = new Date();
-          const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-          const tomorrow = new Date(now.getTime() + 86400000);
-          const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+          const y = now.getFullYear();
+          const m = String(now.getMonth() + 1).padStart(2, '0');
+          const d = String(now.getDate()).padStart(2, '0');
+          const todayStr = `${y}/${m}/${d}`;
+
+          const tm = new Date(now.getTime() + 86400000);
+          const tmY = tm.getFullYear();
+          const tmM = String(tm.getMonth() + 1).padStart(2, '0');
+          const tmD = String(tm.getDate()).padStart(2, '0');
+          const tomorrowStr = `${tmY}/${tmM}/${tmD}`;
 
           data.upcoming.forEach(b => {
             let badgeText = "近期";
@@ -201,15 +217,24 @@
               badgeClass = "bg-amber-100 text-amber-800 font-bold";
             }
 
+            const currentLoc = b.location || '待教練確認';
+
             const div = document.createElement('div');
-            div.className = "flex justify-between items-center text-xs p-3 bg-gray-50 rounded-xl border border-gray-100";
+            div.className = "flex flex-col sm:flex-row justify-between sm:items-center text-xs p-3 bg-gray-50 rounded-xl border border-gray-100 gap-2";
             div.innerHTML = `
               <div class="flex items-center space-x-2">
                 <span class="px-2 py-0.5 rounded-full text-xs ${badgeClass}">${badgeText}</span>
                 <span class="font-bold text-gray-800">${b.studentName}</span>
                 <span class="text-gray-500">${b.date} ${b.time}</span>
               </div>
-              <span class="text-gray-400">(${b.bookedBy})</span>
+              <div class="flex items-center space-x-2">
+                <select onchange="changeBookingLocation('${b.bookingId}', this.value)" class="border border-gray-300 rounded-lg p-1 text-xs outline-none bg-white font-medium text-gray-700">
+                  <option value="賽特體適能中華總店" ${currentLoc === '賽特體適能中華總店' ? 'selected' : ''}>📍 中華總店</option>
+                  <option value="賽特體適能同盟店" ${currentLoc === '賽特體適能同盟店' ? 'selected' : ''}>📍 同盟店</option>
+                  <option value="待教練確認" ${currentLoc === '待教練確認' ? 'selected' : ''}>❓ 待確認</option>
+                </select>
+                <span class="text-gray-400">(${b.bookedBy})</span>
+              </div>
             `;
             container.appendChild(div);
           });
@@ -217,6 +242,23 @@
       } catch (e) {
         console.error("無法載入預約歷程:", e);
         container.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">載入歷史紀錄失敗</p>';
+      }
+    }
+
+    async function changeBookingLocation(bookingId, newLoc) {
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'updateBookingLocation', bookingId: bookingId, location: newLoc })
+        });
+        const result = await res.json();
+        if (result && result.success) {
+          alert(`🎉 ${result.message}`);
+        } else {
+          alert("❌ 切換失敗");
+        }
+      } catch (e) {
+        alert("網路錯誤");
       }
     }
 
@@ -239,6 +281,7 @@
     async function submitCoachBooking() {
       const token = document.getElementById('coachSelectStudent').value;
       const slotId = document.getElementById('coachSelectSlot').value;
+      const location = document.getElementById('coachSelectLocation').value;
 
       if (!token || !slotId) {
         alert("請選擇學員與預約時段！");
@@ -248,12 +291,12 @@
       try {
         const res = await fetch(GAS_URL, {
           method: 'POST',
-          body: JSON.stringify({ action: 'coachBookSlot', token: token, slotId: slotId })
+          body: JSON.stringify({ action: 'coachBookSlot', token: token, slotId: slotId, location: location })
         });
         const result = await res.json();
 
         if (result && result.success) {
-          const notifyMsg = `🏋️‍♂️ [課務通知] 教練已為您安排課程！\n📅 時間：${result.date} ${result.time}\n已自動為您核銷 1 堂課程。`;
+          const notifyMsg = `🏋️‍♂️ [課務通知] 教練已為您安排課程！\n📅 時間：${result.date} ${result.time}\n📍 地點：${result.location}\n已自動為您核銷 1 堂課程。`;
           
           if (confirm(`🎉 教練排課成功！\n\n是否複製下方課務通知簡訊傳給 ${result.studentName}？\n\n${notifyMsg}`)) {
             navigator.clipboard.writeText(notifyMsg);
