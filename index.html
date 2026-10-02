@@ -16,7 +16,7 @@
       <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
     </div>
 
-    <!-- 最近上課提醒卡片 (優先讀取與顯示) -->
+    <!-- 最近上課提醒卡片 (含地點與導航行事曆) -->
     <div id="upcomingSection" class="mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
       <div class="flex justify-between items-center mb-2">
         <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full">載入中</span>
@@ -25,7 +25,11 @@
           <span>📅 加 Google 日曆</span>
         </a>
       </div>
-      <div class="text-xl font-black" id="upcomingTime">正在讀取最近上課時間...</div>
+      <div class="text-xl font-black mb-1" id="upcomingTime">正在讀取最近上課時間...</div>
+      <div class="text-xs opacity-90 flex items-center space-x-1" id="upcomingLocationArea">
+        <span>📍 地點：</span>
+        <span id="upcomingLocation" class="font-bold underline">待教練確認</span>
+      </div>
     </div>
 
     <!-- 堂數資訊卡片 -->
@@ -50,7 +54,7 @@
         <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
       </div>
       <div class="flex justify-between text-gray-600 mb-1">
-        <span>🏋️️‍♂️ 場地費用</span>
+        <span>🏋️‍♂️ 場地費用</span>
         <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
       </div>
       <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
@@ -63,7 +67,14 @@
     <div id="bookingSection" class="mb-6">
       <h2 class="font-bold text-gray-800 text-base mb-1">📅 可預約時段：</h2>
       <div id="bookingArea">
-        <p class="text-xs text-gray-400 mb-3">點選時段後即自動完成核銷與預約</p>
+        <div class="mb-3">
+          <label class="block text-xs font-medium text-gray-600 mb-1">選擇偏好上課地點（選擇後點時段預約）：</label>
+          <select id="userSelectLocation" class="w-full border border-gray-300 rounded-xl p-2 text-xs outline-none focus:ring-2 focus:ring-green-500">
+            <option value="待教練確認">📍 待教練確認</option>
+            <option value="賽特體適能中華總店">📍 賽特體適能中華總店</option>
+            <option value="賽特體適能同盟店">📍 賽特體適能同盟店</option>
+          </select>
+        </div>
         <div id="slotList" class="space-y-2">
           <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-400 text-sm">時段載入中...</div>
         </div>
@@ -96,20 +107,17 @@
           return;
         }
 
-        // 🚀 最佳化載入順序：
-        // 同時發起所有 API 請求，並優先 await loadBookings() 渲染卡片
         const pBookings = loadBookings();
         const pStudentData = loadStudentData();
         const pSlots = loadSlots();
 
-        await pBookings; // 優先讓【最近上課提醒卡片】完成顯示
-        await Promise.all([pStudentData, pSlots]); // 隨後完成其餘區塊
+        await pBookings;
+        await Promise.all([pStudentData, pSlots]);
       } catch (err) {
         console.error("LIFF 初始化失敗:", err);
       }
     }
 
-    // 清洗並格式化日期為 YYYY/MM/DD
     function cleanDateStr(rawDate) {
       if (!rawDate) return '';
       let str = String(rawDate).trim();
@@ -123,8 +131,8 @@
       return str.replace(/-/g, '/');
     }
 
-    // 產生精準的 Google 行事曆一鍵加入連結
-    function generateGoogleCalendarUrl(title, dateStr, timeStr, details) {
+    // 產生帶有 Google 地圖導航座標的 Google 行事曆連結
+    function generateGoogleCalendarUrl(title, dateStr, timeStr, location, details) {
       try {
         const formattedDate = cleanDateStr(dateStr);
         const parts = formattedDate.split('/');
@@ -161,12 +169,12 @@
           action: "TEMPLATE",
           text: title,
           dates: `${startIso}/${endIso}`,
+          location: location || '', // 帶入地點，手機打開可直接導航
           details: details || '',
           ctz: "Asia/Taipei"
         });
         return `${baseUrl}?${params.toString()}`;
       } catch (e) {
-        console.error("Calendar URL Error:", e);
         return "#";
       }
     }
@@ -176,7 +184,7 @@
         const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
         const data = await res.json();
         if (data && data.success) {
-          document.getElementById('studentName').innerText = `嗨！ ${data.name}`;
+          document.getElementById('studentName').innerText = `你好，${data.name}！`;
           document.getElementById('remaining').innerText = data.remaining;
           document.getElementById('total').innerText = data.total;
 
@@ -192,7 +200,6 @@
           document.getElementById('venueFee').innerText = venue.toLocaleString();
           document.getElementById('totalFee').innerText = (course + venue).toLocaleString();
 
-          // 控制整塊約課區塊顯示：無權限直接不顯示約課區塊
           const bookingSec = document.getElementById('bookingSection');
           if (!data.allowSelfBooking) {
             bookingSec.classList.add('hidden');
@@ -216,19 +223,24 @@
         if (data && data.success) {
           const upcomingBadge = document.getElementById('upcomingBadge');
           const upcomingTime = document.getElementById('upcomingTime');
+          const upcomingLocation = document.getElementById('upcomingLocation');
           const addToCalendarBtn = document.getElementById('addToCalendarBtn');
 
           if (data.upcoming && data.upcoming.length > 0) {
-            const next = data.upcoming[0]; // 取得最近一期上課時間
+            const next = data.upcoming[0];
             const displayDate = cleanDateStr(next.date);
+            const locText = next.location || '待教練確認';
+
             upcomingTime.innerText = `${displayDate} ${next.time}`;
+            upcomingLocation.innerText = locText;
             
-            // 綁定一鍵加 Google 行事曆連結
+            // 帶入 Location 生成 Google 日曆按鈕
             const calUrl = generateGoogleCalendarUrl(
               "🏋️‍♂️ 私人教練健身課",
               displayDate,
               next.time,
-              "請準時出席教練課，如有異動請提前通知教練！"
+              locText !== '待教練確認' ? locText : '',
+              `地點：${locText}\n請準時出席教練課！`
             );
             addToCalendarBtn.href = calUrl;
             addToCalendarBtn.classList.remove('hidden');
@@ -255,6 +267,7 @@
           } else {
             upcomingBadge.innerText = "提醒";
             upcomingTime.innerText = "尚無預約課程";
+            upcomingLocation.innerText = "--";
             addToCalendarBtn.classList.add('hidden');
           }
 
@@ -273,9 +286,9 @@
             div.innerHTML = `
               <div>
                 <span class="font-bold text-gray-800">${cleanDateStr(item.date)} ${item.time}</span>
-                <span class="text-gray-400 ml-1">(${item.bookedBy})</span>
+                <span class="text-gray-500 ml-1">📍 ${item.location || '待確認'}</span>
               </div>
-              <span class="text-green-600 font-semibold">已確認</span>
+              <span class="text-green-600 font-semibold">${item.bookedBy}</span>
             `;
             historyContainer.appendChild(div);
           });
@@ -319,12 +332,15 @@
     }
 
     async function book(slotId, timeText) {
-      if (!confirm(`確定要預約 ${timeText} 嗎？`)) return;
+      const locSelect = document.getElementById('userSelectLocation');
+      const chosenLoc = locSelect ? locSelect.value : '待教練確認';
+
+      if (!confirm(`確定要預約 ${timeText} 嗎？\n📍 上課地點：${chosenLoc}`)) return;
 
       try {
         const res = await fetch(GAS_URL, {
           method: 'POST',
-          body: JSON.stringify({ action: 'bookSlot', token: token, slotId: slotId })
+          body: JSON.stringify({ action: 'bookSlot', token: token, slotId: slotId, location: chosenLoc })
         });
         const result = await res.json();
 
@@ -333,7 +349,7 @@
           if (liff.isLoggedIn() && liff.isInClient()) {
             await liff.sendMessages([{
               type: 'text',
-              text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！`
+              text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！\n📍 地點：${chosenLoc}`
             }]);
           }
           liff.closeWindow();
