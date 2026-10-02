@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>教練端學員管理後台</title>
-  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <!-- Tailwind CSS 樣式庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-8">
@@ -16,10 +14,10 @@
     <div class="flex justify-between items-center mb-6">
       <div>
         <h1 class="text-2xl font-bold text-gray-800">🏋‍♂️ 教練端學員管理後台</h1>
-        <p class="text-xs text-gray-500 mt-1">即時檢視學員堂數、費用明細與 LINE LIFF 連結</p>
+        <p class="text-xs text-gray-500 mt-1">即時排課、通知傳送與自主約課權限控制</p>
       </div>
-      <button onclick="loadStudents()" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold py-2 px-4 border border-gray-300 rounded-xl shadow-sm transition flex items-center space-x-1">
-        <span>🔄 重新整理</span>
+      <button onclick="loadData()" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold py-2 px-4 border border-gray-300 rounded-xl shadow-sm transition">
+        🔄 重新整理
       </button>
     </div>
 
@@ -34,9 +32,43 @@
         <div class="text-3xl font-black text-green-600 mt-1" id="statRemainingLessons">-- <span class="text-sm font-normal text-gray-400">堂</span></div>
       </div>
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">總預收費用 (上課+場地)</span>
+        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">總預收費用</span>
         <div class="text-2xl font-black text-blue-600 mt-1">NT\$ <span id="statTotalRevenue">0</span></div>
       </div>
+    </div>
+
+    <!-- 今天與近期排課歷程看板 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
+      <h2 class="font-bold text-gray-800 text-base mb-3 flex items-center">
+        <span>🗓️ 近期已預約課程 (今天/明天/未來)</span>
+      </h2>
+      <div id="upcomingBookingList" class="space-y-2 max-h-48 overflow-y-auto">
+        <div class="text-center py-4 text-gray-400 text-sm">載入中...</div>
+      </div>
+    </div>
+
+    <!-- 【核心新功能】教練幫學員排課區塊 -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
+      <h2 class="font-bold text-gray-800 text-base mb-2">✍️ 教練直接幫學員排課</h2>
+      <p class="text-xs text-gray-400 mb-4">選取學員與開放時段後自動扣課，並產生 LINE 通知簡訊供複製傳送</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">選擇學員 *</label>
+          <select id="coachSelectStudent" class="w-full border border-gray-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-green-500">
+            <option value="">-- 請選擇學員 --</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">選擇開放時段 *</label>
+          <select id="coachSelectSlot" class="w-full border border-gray-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-green-500">
+            <option value="">-- 請選擇時段 --</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="submitCoachBooking()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition">
+        確定為學員排課 (+自動同步 Google 日曆)
+      </button>
     </div>
 
     <!-- 快速新增學員摺疊區塊 -->
@@ -53,23 +85,23 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">專屬 Token (驗證碼) *</label>
-            <input type="text" id="newToken" placeholder="可留空自動生成或填手機號碼/ID" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="text" id="newToken" placeholder="可留空自動生成" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">購買總堂數</label>
-            <input type="number" id="newTotal" value="10" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="number" id="newTotal" value="10" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">初始剩餘堂數</label>
-            <input type="number" id="newRemaining" value="10" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="number" id="newRemaining" value="10" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">上課費用 (NT\$)</label>
-            <input type="number" id="newCourseFee" placeholder="15000" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="number" id="newCourseFee" placeholder="15000" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">場地費用 (NT\$)</label>
-            <input type="number" id="newVenueFee" placeholder="2000" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="number" id="newVenueFee" placeholder="2000" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none">
           </div>
         </div>
         <button onclick="submitNewStudent()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition">
@@ -78,14 +110,13 @@
       </div>
     </div>
 
-    <!-- 學員名冊搜尋與列表 -->
+    <!-- 學員名冊搜尋與自主約課權限控制列表 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-        <h2 class="font-bold text-gray-800 text-lg">👥 學員名冊與約課連結</h2>
+        <h2 class="font-bold text-gray-800 text-lg">👥 學員名冊與約課權限</h2>
         <input type="text" id="searchInput" oninput="filterStudents()" placeholder="🔍 搜尋學員姓名..." class="w-full md:w-64 border border-gray-300 rounded-xl p-2 text-sm outline-none focus:ring-2 focus:ring-green-500">
       </div>
 
-      <!-- 學員卡片列表容器 -->
       <div id="studentListContainer" class="space-y-4">
         <div class="text-center py-8 text-gray-400 text-sm">載入學員資料中...</div>
       </div>
@@ -94,33 +125,28 @@
   </div>
 
   <script>
-    // ⚙️ 設定檔
     const COACH_LIFF_ID = "2011823687-xpS0rFgS"; 
-    // 統一使用的 GAS 網址
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby5pg9LCeT9VC-5qs7lKnoRC6MdJuC6KiRjUjNI53NmFtxCynjbZqK8IWo_nviQDjBF/exec";
-    
-    // 學生端約課的專屬 LIFF 網址基地
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby3lgINctsdKYrPBOLVt3GtGd8dtj4-0-0Q8K3iSlK9fvulWJIMW3bjoUDyfJAgKgXm/exec";
     const STUDENT_LIFF_BASE_URL = "https://liff.line.me/2011814195-BxeoylZA";
 
     let allStudents = [];
+    let availableSlots = [];
 
-    // 初始化 LIFF 並讀取資料
     async function init() {
       try {
-        if (window.liff) {
-          await liff.init({ liffId: COACH_LIFF_ID });
-        }
-      } catch (err) {
-        console.warn("LIFF 初始化警告:", err);
-      }
-      loadStudents();
+        if (window.liff) await liff.init({ liffId: COACH_LIFF_ID });
+      } catch (err) {}
+      loadData();
     }
 
-    // 載入全體學員資料
-    async function loadStudents() {
-      const container = document.getElementById('studentListContainer');
-      container.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">載入學員資料中...</div>';
+    async function loadData() {
+      await loadStudents();
+      await loadSlots();
+      await loadCoachBookings();
+    }
 
+    // 載入全體學員
+    async function loadStudents() {
       try {
         const res = await fetch(`${GAS_URL}?action=getCoachStudents`);
         const data = await res.json();
@@ -128,27 +154,152 @@
           allStudents = data.students || [];
           renderDashboard(allStudents);
           renderStudentCards(allStudents);
-        } else {
-          container.innerHTML = `<p class="text-red-500 text-sm py-4 text-center">無法載入資料：${data.message || '未知錯誤'}</p>`;
+          populateStudentDropdown(allStudents);
         }
       } catch (e) {
-        console.error("無法連線至 GAS:", e);
-        container.innerHTML = '<p class="text-red-500 text-sm py-4 text-center">網路連線異常，請確認 GAS 部署權限或重新整理。</p>';
+        console.error(e);
       }
     }
 
-    // 渲染儀表板數據
+    // 載入開放時段
+    async function loadSlots() {
+      try {
+        const res = await fetch(`${GAS_URL}?action=getAvailableSlots`);
+        availableSlots = await res.json();
+        populateSlotDropdown(availableSlots);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 載入近期所有學員的預約
+    async function loadCoachBookings() {
+      const container = document.getElementById('upcomingBookingList');
+      try {
+        const res = await fetch(`${GAS_URL}?action=getCoachAllBookings`);
+        const data = await res.json();
+        if (data.success) {
+          container.innerHTML = '';
+          if (!data.upcoming || data.upcoming.length === 0) {
+            container.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">近期無已預約課程</p>';
+            return;
+          }
+          
+          const todayStr = new Date().toISOString().split('T')[0];
+          const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+          data.upcoming.forEach(b => {
+            let badgeText = "近期";
+            let badgeClass = "bg-gray-100 text-gray-600";
+            if (b.date === todayStr) {
+              badgeText = "🔥 今天";
+              badgeClass = "bg-red-100 text-red-700 font-bold";
+            } else if (b.date === tomorrowStr) {
+              badgeText = "⚡ 明天";
+              badgeClass = "bg-amber-100 text-amber-800 font-bold";
+            }
+
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center text-xs p-3 bg-gray-50 rounded-xl border border-gray-100";
+            div.innerHTML = `
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded-full text-xs ${badgeClass}">${badgeText}</span>
+                <span class="font-bold text-gray-800">${b.studentName}</span>
+                <span class="text-gray-500">${b.date} ${b.time}</span>
+              </div>
+              <span class="text-gray-400">(${b.bookedBy})</span>
+            `;
+            container.appendChild(div);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function populateStudentDropdown(students) {
+      const select = document.getElementById('coachSelectStudent');
+      select.innerHTML = '<option value="">-- 請選擇學員 --</option>';
+      students.forEach(s => {
+        select.innerHTML += `<option value="${s.token}">${s.name} (剩餘 ${s.remaining} 堂)</option>`;
+      });
+    }
+
+    function populateSlotDropdown(slots) {
+      const select = document.getElementById('coachSelectSlot');
+      select.innerHTML = '<option value="">-- 請選擇時段 --</option>';
+      slots.forEach(s => {
+        select.innerHTML += `<option value="${s.slotId}">${s.date} ${s.time}</option>`;
+      });
+    }
+
+    // 教練幫學員排課
+    async function submitCoachBooking() {
+      const token = document.getElementById('coachSelectStudent').value;
+      const slotId = document.getElementById('coachSelectSlot').value;
+
+      if (!token || !slotId) {
+        alert("請選擇學員與預約時段！");
+        return;
+      }
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'coachBookSlot', token: token, slotId: slotId })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          const notifyMsg = `🏋️‍♂️ [課務通知] 教練已為您安排課程！\n📅 時間：${result.date} ${result.time}\n已自動為您核銷 1 堂課程。`;
+          
+          if (confirm(`🎉 教練排課成功！\n\n是否複製下方課務通知簡訊傳給 ${result.studentName}？\n\n${notifyMsg}`)) {
+            navigator.clipboard.writeText(notifyMsg);
+            alert("已複製通知內容！可以直接貼給學員。");
+          }
+          loadData();
+        } else {
+          alert(`❌ 排課失敗：${result.message}`);
+        }
+      } catch (e) {
+        alert("網路錯誤，請重試");
+      }
+    }
+
+    // 切換自主約課權限
+    async function togglePermission(studentId, currentAllow) {
+      const targetAllow = !currentAllow;
+      const confirmMsg = targetAllow ? 
+        "確定要開啟該學員的「自主約課」功能嗎？" : 
+        "確定要關閉該學員的「自主約課」功能嗎？關閉後學員將無法自行選時段預約。";
+
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'toggleSelfBooking', studentId: studentId, allowSelfBooking: targetAllow })
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert(result.message);
+          loadStudents();
+        } else {
+          alert("❌ 切換失敗：" + result.message);
+        }
+      } catch (e) {
+        alert("網路連線失敗");
+      }
+    }
+
     function renderDashboard(students) {
       document.getElementById('statStudentCount').innerText = students.length;
-      
       const totalRemaining = students.reduce((sum, s) => sum + (Number(s.remaining) || 0), 0);
       document.getElementById('statRemainingLessons').innerText = totalRemaining;
-
       const totalRevenue = students.reduce((sum, s) => sum + (Number(s.courseFee) || 0) + (Number(s.venueFee) || 0), 0);
       document.getElementById('statTotalRevenue').innerText = totalRevenue.toLocaleString();
     }
 
-    // 渲染學員名冊卡片
     function renderStudentCards(students) {
       const container = document.getElementById('studentListContainer');
       container.innerHTML = '';
@@ -162,9 +313,12 @@
         const total = Number(student.total) || 1;
         const remaining = Number(student.remaining) || 0;
         const percent = Math.min(Math.round((remaining / total) * 100), 100);
-        // 自動生成帶有該學生專屬 Token 的學生端 LIFF 連結
         const studentLiffLink = `${STUDENT_LIFF_BASE_URL}?token=${encodeURIComponent(student.token)}`;
         const totalFee = (Number(student.courseFee) || 0) + (Number(student.venueFee) || 0);
+
+        const isAllow = student.allowSelfBooking !== false;
+        const btnColor = isAllow ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-amber-100 text-amber-800 border-amber-300";
+        const btnText = isAllow ? "🟢 自主約課: 開啟中" : "🔴 自主約課: 已關閉";
 
         const card = document.createElement('div');
         card.className = "border border-gray-200 rounded-xl p-4 hover:border-green-300 transition shadow-sm bg-white";
@@ -173,9 +327,11 @@
             <div>
               <div class="flex items-center space-x-2">
                 <span class="text-lg font-bold text-gray-800">${student.name}</span>
-                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">ID: ${student.studentId}</span>
+                <button onclick="togglePermission('${student.studentId}', ${isAllow})" class="text-xs px-2.5 py-0.5 rounded-full border ${btnColor} font-semibold transition">
+                  ${btnText}
+                </button>
               </div>
-              <div class="text-xs text-gray-400 mt-0.5">Token: <code class="bg-gray-50 px-1 py-0.5 rounded">${student.token}</code></div>
+              <div class="text-xs text-gray-400 mt-1">Token: <code class="bg-gray-50 px-1 py-0.5 rounded">${student.token}</code></div>
             </div>
             <div class="text-right">
               <span class="text-xs text-gray-500">剩餘 / 總堂數</span>
@@ -183,20 +339,18 @@
             </div>
           </div>
 
-          <!-- 堂數進度條 -->
           <div class="w-full bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
             <div class="bg-green-500 h-2 rounded-full" style="width: ${percent}%"></div>
           </div>
 
-          <!-- 費用與複製按鈕區 -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs text-gray-600 bg-gray-50 p-2.5 rounded-lg">
             <div>
               上課費: <span class="font-semibold text-gray-800">\$${Number(student.courseFee).toLocaleString()}</span> | 
               場地費: <span class="font-semibold text-gray-800">\$${Number(student.venueFee).toLocaleString()}</span> 
               <span class="font-bold text-green-700 ml-1">(總計: \$${totalFee.toLocaleString()})</span>
             </div>
-            <button onclick="copyLiffLink('${studentLiffLink}', '${student.name}')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs flex items-center justify-center space-x-1">
-              <span>📋 複製專屬約課連結</span>
+            <button onclick="copyLiffLink('${studentLiffLink}', '${student.name}')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs">
+              📋 複製約課連結
             </button>
           </div>
         `;
@@ -204,56 +358,28 @@
       });
     }
 
-    // 搜尋過濾學員
     function filterStudents() {
       const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
       const filtered = allStudents.filter(s => s.name.toLowerCase().includes(keyword) || String(s.token).toLowerCase().includes(keyword));
       renderStudentCards(filtered);
     }
 
-    // 一鍵複製學生約課連結
     function copyLiffLink(link, name) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(link).then(() => {
-          alert(`已成功複製【${name}】的專屬 LINE 約課連結！\n可以直接貼到與學員的 LINE 私人對話框囉！`);
-        }).catch(() => {
-          prompt("請手動複製以下連結：", link);
-        });
-      } else {
-        prompt("請手動複製以下連結：", link);
-      }
+      navigator.clipboard.writeText(link).then(() => {
+        alert(`已複製【${name}】的專屬 LINE 約課連結！`);
+      });
     }
 
-    // 折疊/展開新增表單
     function toggleAddForm() {
       const form = document.getElementById('addStudentForm');
-      const icon = document.getElementById('formToggleIcon');
-      if (form.classList.contains('hidden')) {
-        form.classList.remove('hidden');
-        icon.innerText = '收合 ▲';
-      } else {
-        form.classList.add('hidden');
-        icon.innerText = '展開 ▼';
-      }
+      form.classList.toggle('hidden');
     }
 
-    // 送出新增學員
     async function submitNewStudent() {
       const name = document.getElementById('newName').value.trim();
       let token = document.getElementById('newToken').value.trim();
-      const total = document.getElementById('newTotal').value;
-      const remaining = document.getElementById('newRemaining').value;
-      const courseFee = document.getElementById('newCourseFee').value;
-      const venueFee = document.getElementById('newVenueFee').value;
-
-      if (!name) {
-        alert("請填寫學員姓名！");
-        return;
-      }
-
-      if (!token) {
-        token = 'tk_' + Math.floor(Math.random() * 1000000);
-      }
+      if (!name) return alert("請填寫學員姓名！");
+      if (!token) token = 'tk_' + Math.floor(Math.random() * 1000000);
 
       try {
         const res = await fetch(GAS_URL, {
@@ -262,24 +388,19 @@
             action: 'addStudent',
             name: name,
             token: token,
-            total: total,
-            remaining: remaining,
-            courseFee: courseFee,
-            venueFee: venueFee
+            total: document.getElementById('newTotal').value,
+            remaining: document.getElementById('newRemaining').value,
+            courseFee: document.getElementById('newCourseFee').value,
+            venueFee: document.getElementById('newVenueFee').value
           })
         });
         const result = await res.json();
         if (result.success) {
           alert("🎉 學員新增成功！");
-          document.getElementById('newName').value = '';
-          document.getElementById('newToken').value = '';
-          toggleAddForm();
-          loadStudents();
-        } else {
-          alert("❌ 新增失敗：" + result.message);
+          loadData();
         }
       } catch (e) {
-        alert("網路錯誤，請重試");
+        alert("網路錯誤");
       }
     }
 
