@@ -48,7 +48,7 @@
         <span class="font-semibold text-gray-800">NT\$ <span id="courseFee">0</span></span>
       </div>
       <div class="flex justify-between text-gray-600 mb-1">
-        <span>🏋️‍♂️ 場地費用</span>
+        <span>🏋️️‍♂️ 場地費用</span>
         <span class="font-semibold text-gray-800">NT\$ <span id="venueFee">0</span></span>
       </div>
       <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
@@ -85,7 +85,8 @@
 
   <script>
     const LIFF_ID = "2011814195-BxeoylZA"; 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby3lgINctsdKYrPBOLVt3GtGd8dtj4-0-0Q8K3iSlK9fvulWJIMW3bjoUDyfJAgKgXm/exec";
+    // 最新 GAS Web App URL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby5pg9LCeT9VC-5qs7lKnoRC6MdJuC6KiRjUjNI53NmFtxCynjbZqK8IWo_nviQDjBF/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -147,7 +148,7 @@
         
         if (data && data.success) {
           if (data.upcoming && data.upcoming.length > 0) {
-            const next = data.upcoming[0]; // 取得下一堂課
+            const next = data.upcoming[0];
             const upcomingSec = document.getElementById('upcomingSection');
             upcomingSec.classList.remove('hidden');
             document.getElementById('upcomingTime').innerText = `${next.date} ${next.time}`;
