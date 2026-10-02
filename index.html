@@ -95,7 +95,7 @@
         if (window.liff) await liff.init({ liffId: LIFF_ID });
         if (!token) {
           document.getElementById('studentName').innerText = "⚠️ 連結無效";
-          document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm">請透過教練傳送的專屬連結開啟預約頁面。</p>';
+          document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm py-2">請透過教練傳送的專屬連結開啟預約頁面。</p>';
           return;
         }
         await loadStudentData();
@@ -131,9 +131,12 @@
             document.getElementById('bookingArea').classList.add('hidden');
             document.getElementById('bookingDisabledArea').classList.remove('hidden');
           }
+        } else {
+          document.getElementById('studentName').innerText = "查無學員資料";
         }
       } catch (e) {
-        console.error(e);
+        console.error("無法取得學員資料:", e);
+        document.getElementById('studentName').innerText = "載入失敗";
       }
     }
 
@@ -144,13 +147,13 @@
         
         if (data.success) {
           if (data.upcoming && data.upcoming.length > 0) {
-            const next = data.upcoming[0]; // 已修正取第一個物件
+            const next = data.upcoming[0]; // 正確取得陣列第 0 筆物件
             const upcomingSec = document.getElementById('upcomingSection');
             upcomingSec.classList.remove('hidden');
             document.getElementById('upcomingTime').innerText = `${next.date} ${next.time}`;
             
-            const todayStr = new Date().toISOString().split('T')[0]; // 已修正 [0]
-            const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0]; // 已修正 [0]
+            const todayStr = new Date().toISOString().split('T')[0];
+            const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
             
             if (next.date === todayStr) {
               document.getElementById('upcomingBadge').innerText = "🔥 今天上課";
@@ -184,7 +187,8 @@
           });
         }
       } catch (e) {
-        console.error(e);
+        console.error("無法載入紀錄:", e);
+        document.getElementById('historyList').innerHTML = '<p class="text-xs text-gray-400 text-center py-2">紀錄載入失敗</p>';
       }
     }
 
@@ -214,7 +218,8 @@
           container.appendChild(btn);
         });
       } catch (e) {
-        console.error(e);
+        console.error("無法載入時段:", e);
+        document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm py-2">載入時段失敗</p>';
       }
     }
 
