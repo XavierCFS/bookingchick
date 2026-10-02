@@ -16,14 +16,20 @@
       <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
     </div>
 
-    <!-- 最近上課提醒卡片 (固定顯示) -->
+    <!-- 最近上課提醒卡片 (固定顯示 + 一鍵加 Google 日曆按鈕) -->
     <div id="upcomingSection" class="mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
       <div class="flex justify-between items-center mb-1">
         <span class="text-xs uppercase font-bold tracking-wider opacity-80">🗓️ 下一堂預約課程</span>
         <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">提醒</span>
       </div>
       <div class="text-xl font-black" id="upcomingTime">尚無預約課程</div>
-      <div class="text-xs mt-1 opacity-90" id="upcomingDetail">目前沒有安排中的課程</div>
+      <div class="flex justify-between items-end mt-2">
+        <div class="text-xs opacity-90" id="upcomingDetail">目前沒有安排中的課程</div>
+        <!-- 一鍵加入 Google 日曆按鈕 -->
+        <a id="addToCalendarBtn" href="#" target="_blank" class="hidden text-xs bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
+          <span>📅 加 Google 日曆</span>
+        </a>
+      </div>
     </div>
 
     <!-- 堂數資訊卡片 -->
@@ -101,6 +107,36 @@
       }
     }
 
+    // 產生 Google 行事曆一鍵加入連結
+    function generateGoogleCalendarUrl(title, dateStr, timeStr, details) {
+      try {
+        const times = String(timeStr).split('-');
+        const startTime = times[0].trim();
+        const endTime = times[1] ? times[1].trim() : startTime;
+
+        const dateClean = String(dateStr).replace(/-/g, '');
+        const startIso = `${dateClean}T${startTime.replace(':', '')}00`;
+        
+        let endIso = `${dateClean}T${endTime.replace(':', '')}00`;
+        if (startTime === endTime) {
+          const [h, m] = startTime.split(':').map(Number);
+          const endH = String(h + 1).padStart(2, '0');
+          endIso = `${dateClean}T${endH}${String(m).padStart(2, '0')}00`;
+        }
+
+        const baseUrl = "https://calendar.google.com/calendar/render";
+        const params = new URLSearchParams({
+          action: "TEMPLATE",
+          text: title,
+          dates: `${startIso}/${endIso}`,
+          details: details
+        });
+        return `${baseUrl}?${params.toString()}`;
+      } catch (e) {
+        return "#";
+      }
+    }
+
     async function loadStudentData() {
       try {
         const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
@@ -147,12 +183,23 @@
           const upcomingBadge = document.getElementById('upcomingBadge');
           const upcomingTime = document.getElementById('upcomingTime');
           const upcomingDetail = document.getElementById('upcomingDetail');
+          const addToCalendarBtn = document.getElementById('addToCalendarBtn');
 
           if (data.upcoming && data.upcoming.length > 0) {
             const next = data.upcoming[0];
             upcomingTime.innerText = `${next.date} ${next.time}`;
-            upcomingDetail.innerText = "已排入教練行程，請準時上課";
+            upcomingDetail.innerText = "已排入行程，請準時上課";
             
+            // 綁定一鍵加 Google 行事曆連結
+            const calUrl = generateGoogleCalendarUrl(
+              "🏋️‍♂️ 私人教練健身課",
+              next.date,
+              next.time,
+              "請準時出席教練課，如有異動請提前通知教練！"
+            );
+            addToCalendarBtn.href = calUrl;
+            addToCalendarBtn.classList.remove('hidden');
+
             const now = new Date();
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             const tomorrow = new Date(now.getTime() + 86400000);
@@ -166,10 +213,10 @@
               upcomingBadge.innerText = "近期課程";
             }
           } else {
-            // 固定顯示：無預預課程時的狀態
             upcomingBadge.innerText = "提醒";
             upcomingTime.innerText = "尚無預約課程";
             upcomingDetail.innerText = "目前沒有安排中的課程";
+            addToCalendarBtn.classList.add('hidden');
           }
 
           const historyContainer = document.getElementById('historyList');
