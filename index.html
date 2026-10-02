@@ -1,3 +1,5 @@
+📱 1. 學員端網頁 (index.html)
+點擊右上角 【Copy / 複製】 按鈕即可一鍵複製整段程式碼：
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -16,14 +18,14 @@
       <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
     </div>
 
-    <!-- 最近上課提醒卡片 -->
-    <div id="upcomingSection" class="hidden mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
+    <!-- 最近上課提醒卡片 (固定顯示) -->
+    <div id="upcomingSection" class="mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
       <div class="flex justify-between items-center mb-1">
         <span class="text-xs uppercase font-bold tracking-wider opacity-80">🗓️ 下一堂預約課程</span>
-        <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">近期</span>
+        <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">提醒</span>
       </div>
-      <div class="text-xl font-black" id="upcomingTime">--</div>
-      <div class="text-xs mt-1 opacity-90" id="upcomingDetail">已排入教練行程</div>
+      <div class="text-xl font-black" id="upcomingTime">尚無預約課程</div>
+      <div class="text-xs mt-1 opacity-90" id="upcomingDetail">目前沒有安排中的課程</div>
     </div>
 
     <!-- 堂數資訊卡片 -->
@@ -45,31 +47,26 @@
     <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5 text-sm">
       <div class="flex justify-between text-gray-600 mb-1">
         <span>🎓 上課費用</span>
-        <span class="font-semibold text-gray-800">NT\$ <span id="courseFee">0</span></span>
+        <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
       </div>
       <div class="flex justify-between text-gray-600 mb-1">
         <span>🏋️‍♂️ 場地費用</span>
-        <span class="font-semibold text-gray-800">NT\$ <span id="venueFee">0</span></span>
+        <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
       </div>
       <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
         <span>合計總費用</span>
-        <span class="text-green-700">NT\$ <span id="totalFee">0</span></span>
+        <span class="text-green-700">NT <span id="totalFee">0</span></span>
       </div>
     </div>
 
-    <!-- 約課區塊 -->
-    <div class="mb-6">
+    <!-- 約課區塊 (無約課功能時整塊隱藏) -->
+    <div id="bookingSection" class="mb-6">
       <h2 class="font-bold text-gray-800 text-base mb-1">📅 可預約時段：</h2>
       <div id="bookingArea">
         <p class="text-xs text-gray-400 mb-3">點選時段後即自動完成核銷與預約</p>
         <div id="slotList" class="space-y-2">
           <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-400 text-sm">時段載入中...</div>
         </div>
-      </div>
-      <!-- 權限關閉提示 -->
-      <div id="bookingDisabledArea" class="hidden p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm">
-        <p class="font-bold mb-1">🔒 目前由教練統一為您排課</p>
-        <p class="text-xs text-amber-700">自主約課功能已由教練暫時關閉。如有改期或預約需求，請直接在 LINE 告知教練即可！</p>
       </div>
     </div>
 
@@ -127,13 +124,12 @@
           document.getElementById('venueFee').innerText = venue.toLocaleString();
           document.getElementById('totalFee').innerText = (course + venue).toLocaleString();
 
-          // 控制可預約區域顯示
+          // 控制整塊約課區塊顯示：無權限直接不顯示約課區塊
+          const bookingSec = document.getElementById('bookingSection');
           if (!data.allowSelfBooking) {
-            document.getElementById('bookingArea').classList.add('hidden');
-            document.getElementById('bookingDisabledArea').classList.remove('hidden');
+            bookingSec.classList.add('hidden');
           } else {
-            document.getElementById('bookingArea').classList.remove('hidden');
-            document.getElementById('bookingDisabledArea').classList.add('hidden');
+            bookingSec.classList.remove('hidden');
           }
         } else {
           document.getElementById('studentName').innerText = "查無學員資料";
@@ -150,11 +146,14 @@
         const data = await res.json();
         
         if (data && data.success) {
+          const upcomingBadge = document.getElementById('upcomingBadge');
+          const upcomingTime = document.getElementById('upcomingTime');
+          const upcomingDetail = document.getElementById('upcomingDetail');
+
           if (data.upcoming && data.upcoming.length > 0) {
             const next = data.upcoming[0];
-            const upcomingSec = document.getElementById('upcomingSection');
-            upcomingSec.classList.remove('hidden');
-            document.getElementById('upcomingTime').innerText = `${next.date} ${next.time}`;
+            upcomingTime.innerText = `${next.date} ${next.time}`;
+            upcomingDetail.innerText = "已排入教練行程，請準時上課";
             
             const now = new Date();
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -162,12 +161,17 @@
             const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
 
             if (next.date === todayStr) {
-              document.getElementById('upcomingBadge').innerText = "🔥 今天上課";
+              upcomingBadge.innerText = "🔥 今天上課";
             } else if (next.date === tomorrowStr) {
-              document.getElementById('upcomingBadge').innerText = "⚡ 明天上課";
+              upcomingBadge.innerText = "⚡ 明天上課";
             } else {
-              document.getElementById('upcomingBadge').innerText = "近期課程";
+              upcomingBadge.innerText = "近期課程";
             }
+          } else {
+            // 固定顯示：無預預課程時的狀態
+            upcomingBadge.innerText = "提醒";
+            upcomingTime.innerText = "尚無預約課程";
+            upcomingDetail.innerText = "目前沒有安排中的課程";
           }
 
           const historyContainer = document.getElementById('historyList');
