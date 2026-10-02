@@ -176,7 +176,7 @@
         const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
         const data = await res.json();
         if (data && data.success) {
-          document.getElementById('studentName').innerText = `你好，${data.name}！`;
+          document.getElementById('studentName').innerText = `嗨！ ${data.name}`;
           document.getElementById('remaining').innerText = data.remaining;
           document.getElementById('total').innerText = data.total;
 
