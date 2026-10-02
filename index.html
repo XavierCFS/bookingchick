@@ -16,20 +16,16 @@
       <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
     </div>
 
-    <!-- 最近上課提醒卡片 (固定顯示 + 一鍵加 Google 日曆按鈕) -->
+    <!-- 最近上課提醒卡片 (優先讀取與顯示) -->
     <div id="upcomingSection" class="mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
-      <div class="flex justify-between items-center mb-1">
-        <span class="text-xs uppercase font-bold tracking-wider opacity-80">🗓️ 下一堂預約課程</span>
-        <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">提醒</span>
-      </div>
-      <div class="text-xl font-black" id="upcomingTime">尚無預約課程</div>
-      <div class="flex justify-between items-end mt-2">
-        <div class="text-xs opacity-90" id="upcomingDetail">目前沒有安排中的課程</div>
+      <div class="flex justify-between items-center mb-2">
+        <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full">載入中</span>
         <!-- 一鍵加入 Google 日曆按鈕 -->
         <a id="addToCalendarBtn" href="#" target="_blank" class="hidden text-xs bg-white hover:bg-emerald-50 text-emerald-800 font-bold px-3 py-1.5 rounded-lg shadow transition flex items-center space-x-1">
           <span>📅 加 Google 日曆</span>
         </a>
       </div>
+      <div class="text-xl font-black" id="upcomingTime">正在讀取最近上課時間...</div>
     </div>
 
     <!-- 堂數資訊卡片 -->
@@ -54,7 +50,7 @@
         <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
       </div>
       <div class="flex justify-between text-gray-600 mb-1">
-        <span>🏋️‍♂️ 場地費用</span>
+        <span>🏋️️‍♂️ 場地費用</span>
         <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
       </div>
       <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
@@ -63,7 +59,7 @@
       </div>
     </div>
 
-    <!-- 約課區塊 (無約課功能時整塊隱藏) -->
+    <!-- 約課區塊 -->
     <div id="bookingSection" class="mb-6">
       <h2 class="font-bold text-gray-800 text-base mb-1">📅 可預約時段：</h2>
       <div id="bookingArea">
@@ -99,40 +95,78 @@
           document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm py-2">請透過教練傳送的專屬連結開啟預約頁面。</p>';
           return;
         }
-        await loadStudentData();
-        await loadBookings();
-        await loadSlots();
+
+        // 🚀 最佳化載入順序：
+        // 同時發起所有 API 請求，並優先 await loadBookings() 渲染卡片
+        const pBookings = loadBookings();
+        const pStudentData = loadStudentData();
+        const pSlots = loadSlots();
+
+        await pBookings; // 優先讓【最近上課提醒卡片】完成顯示
+        await Promise.all([pStudentData, pSlots]); // 隨後完成其餘區塊
       } catch (err) {
         console.error("LIFF 初始化失敗:", err);
       }
     }
 
-    // 產生 Google 行事曆一鍵加入連結
+    // 清洗並格式化日期為 YYYY/MM/DD
+    function cleanDateStr(rawDate) {
+      if (!rawDate) return '';
+      let str = String(rawDate).trim();
+      const d = new Date(str);
+      if (!isNaN(d.getTime()) && (str.includes('GMT') || str.includes('T') || str.length > 10)) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}/${m}/${day}`;
+      }
+      return str.replace(/-/g, '/');
+    }
+
+    // 產生精準的 Google 行事曆一鍵加入連結
     function generateGoogleCalendarUrl(title, dateStr, timeStr, details) {
       try {
+        const formattedDate = cleanDateStr(dateStr);
+        const parts = formattedDate.split('/');
+        if (parts.length < 3) return "#";
+
+        const y = parts[0];
+        const m = String(parts[1]).padStart(2, '0');
+        const day = String(parts[2]).padStart(2, '0');
+        const dateClean = `${y}${m}${day}`;
+
         const times = String(timeStr).split('-');
-        const startTime = times[0].trim();
+        const startTime = times[0] ? times[0].trim() : '00:00';
         const endTime = times[1] ? times[1].trim() : startTime;
 
-        const dateClean = String(dateStr).replace(/-/g, '');
-        const startIso = `${dateClean}T${startTime.replace(':', '')}00`;
-        
-        let endIso = `${dateClean}T${endTime.replace(':', '')}00`;
-        if (startTime === endTime) {
-          const [h, m] = startTime.split(':').map(Number);
-          const endH = String(h + 1).padStart(2, '0');
-          endIso = `${dateClean}T${endH}${String(m).padStart(2, '0')}00`;
+        const sParts = startTime.split(':');
+        const sH = String(sParts[0] || '00').padStart(2, '0');
+        const sM = String(sParts[1] || '00').padStart(2, '0');
+
+        let eH, eM;
+        if (times[1] && endTime.includes(':')) {
+          const eParts = endTime.split(':');
+          eH = String(eParts[0] || '00').padStart(2, '0');
+          eM = String(eParts[1] || '00').padStart(2, '0');
+        } else {
+          eH = String(Number(sH) + 1).padStart(2, '0');
+          eM = sM;
         }
+
+        const startIso = `${dateClean}T${sH}${sM}00`;
+        const endIso = `${dateClean}T${eH}${eM}00`;
 
         const baseUrl = "https://calendar.google.com/calendar/render";
         const params = new URLSearchParams({
           action: "TEMPLATE",
           text: title,
           dates: `${startIso}/${endIso}`,
-          details: details
+          details: details || '',
+          ctz: "Asia/Taipei"
         });
         return `${baseUrl}?${params.toString()}`;
       } catch (e) {
+        console.error("Calendar URL Error:", e);
         return "#";
       }
     }
@@ -182,18 +216,17 @@
         if (data && data.success) {
           const upcomingBadge = document.getElementById('upcomingBadge');
           const upcomingTime = document.getElementById('upcomingTime');
-          const upcomingDetail = document.getElementById('upcomingDetail');
           const addToCalendarBtn = document.getElementById('addToCalendarBtn');
 
           if (data.upcoming && data.upcoming.length > 0) {
-            const next = data.upcoming[0];
-            upcomingTime.innerText = `${next.date} ${next.time}`;
-            upcomingDetail.innerText = "已排入行程，請準時上課";
+            const next = data.upcoming[0]; // 取得最近一期上課時間
+            const displayDate = cleanDateStr(next.date);
+            upcomingTime.innerText = `${displayDate} ${next.time}`;
             
             // 綁定一鍵加 Google 行事曆連結
             const calUrl = generateGoogleCalendarUrl(
               "🏋️‍♂️ 私人教練健身課",
-              next.date,
+              displayDate,
               next.time,
               "請準時出席教練課，如有異動請提前通知教練！"
             );
@@ -201,13 +234,20 @@
             addToCalendarBtn.classList.remove('hidden');
 
             const now = new Date();
-            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-            const tomorrow = new Date(now.getTime() + 86400000);
-            const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${y}/${m}/${d}`;
 
-            if (next.date === todayStr) {
+            const tm = new Date(now.getTime() + 86400000);
+            const tmY = tm.getFullYear();
+            const tmM = String(tm.getMonth() + 1).padStart(2, '0');
+            const tmD = String(tm.getDate()).padStart(2, '0');
+            const tomorrowStr = `${tmY}/${tmM}/${tmD}`;
+
+            if (displayDate === todayStr) {
               upcomingBadge.innerText = "🔥 今天上課";
-            } else if (next.date === tomorrowStr) {
+            } else if (displayDate === tomorrowStr) {
               upcomingBadge.innerText = "⚡ 明天上課";
             } else {
               upcomingBadge.innerText = "近期課程";
@@ -215,7 +255,6 @@
           } else {
             upcomingBadge.innerText = "提醒";
             upcomingTime.innerText = "尚無預約課程";
-            upcomingDetail.innerText = "目前沒有安排中的課程";
             addToCalendarBtn.classList.add('hidden');
           }
 
@@ -233,7 +272,7 @@
             div.className = "flex justify-between items-center text-xs p-2.5 bg-gray-50 rounded-lg border border-gray-100";
             div.innerHTML = `
               <div>
-                <span class="font-bold text-gray-800">${item.date} ${item.time}</span>
+                <span class="font-bold text-gray-800">${cleanDateStr(item.date)} ${item.time}</span>
                 <span class="text-gray-400 ml-1">(${item.bookedBy})</span>
               </div>
               <span class="text-green-600 font-semibold">已確認</span>
@@ -262,14 +301,15 @@
         slots.forEach(slot => {
           const btn = document.createElement('button');
           btn.className = "w-full bg-white hover:bg-green-50 text-gray-800 border border-gray-200 hover:border-green-400 font-semibold py-3 px-4 rounded-xl flex justify-between items-center shadow-sm transition";
+          const slotDateStr = cleanDateStr(slot.date);
           btn.innerHTML = `
             <div class="flex items-center space-x-2">
               <span class="text-green-600">📅</span>
-              <span>${slot.date} ${slot.time}</span>
+              <span>${slotDateStr} ${slot.time}</span>
             </div>
             <span class="text-xs bg-green-500 text-white font-medium px-2.5 py-1 rounded-full">預約</span>
           `;
-          btn.onclick = () => book(slot.slotId, `${slot.date} ${slot.time}`);
+          btn.onclick = () => book(slot.slotId, `${slotDateStr} ${slot.time}`);
           container.appendChild(btn);
         });
       } catch (e) {
