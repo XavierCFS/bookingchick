@@ -40,7 +40,7 @@
     <!-- 今天與近期排課歷程看板 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
       <h2 class="font-bold text-gray-800 text-base mb-3 flex items-center">
-        <span>🗓️ 近期已預約課程</span>
+        <span>🗓️️ 近期已預約課程 (今天/明天/未來)</span>
       </h2>
       <div id="upcomingBookingList" class="space-y-2 max-h-48 overflow-y-auto">
         <div class="text-center py-4 text-gray-400 text-sm">載入中...</div>
@@ -67,7 +67,7 @@
         </div>
       </div>
       <button onclick="submitCoachBooking()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition">
-        確定為學員排課 並 同步Google日曆
+        確定為學員排課 (+自動同步 Google 日曆)
       </button>
     </div>
 
@@ -81,7 +81,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">學員姓名 *</label>
-            <input type="text" id="newName" placeholder="例如：林小美" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="text" id="newName" placeholder="例如：林小美" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-green-500">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">專屬 Token (驗證碼) *</label>
@@ -154,9 +154,12 @@
           renderDashboard(allStudents);
           renderStudentCards(allStudents);
           populateStudentDropdown(allStudents);
+        } else {
+          document.getElementById('studentListContainer').innerHTML = `<p class="text-red-500 text-sm py-4 text-center">無法載入：${data.message || '格式錯誤'}</p>`;
         }
       } catch (e) {
-        console.error(e);
+        console.error("無法載入學員:", e);
+        document.getElementById('studentListContainer').innerHTML = '<p class="text-red-500 text-sm py-4 text-center">網路連線異常，請重新整理</p>';
       }
     }
 
@@ -166,7 +169,7 @@
         availableSlots = await res.json();
         populateSlotDropdown(availableSlots);
       } catch (e) {
-        console.error(e);
+        console.error("無法載入時段:", e);
       }
     }
 
@@ -182,8 +185,8 @@
             return;
           }
           
-          const todayStr = new Date().toISOString().split('T')[0]; // 已修正 [0]
-          const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0]; // 已修正 [0]
+          const todayStr = new Date().toISOString().split('T')[0];
+          const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
           data.upcoming.forEach(b => {
             let badgeText = "近期";
@@ -210,7 +213,8 @@
           });
         }
       } catch (e) {
-        console.error(e);
+        console.error("無法載入預約歷程:", e);
+        container.innerHTML = '<p class="text-xs text-gray-400 text-center py-3">載入歷史紀錄失敗</p>';
       }
     }
 
@@ -247,7 +251,7 @@
         const result = await res.json();
 
         if (result.success) {
-          const notifyMsg = `🏋️‍♂️ [課務通知] 教練已為您安排課程！\n📅 時間：${result.date} ${result.time}\n已自動為您核銷 1 堂課程。`;
+          const notifyMsg = `🏋️️‍♂️ [課務通知] 教練已為您安排課程！\n📅 時間：${result.date} ${result.time}\n已自動為您核銷 1 堂課程。`;
           
           if (confirm(`🎉 教練排課成功！\n\n是否複製下方課務通知簡訊傳給 ${result.studentName}？\n\n${notifyMsg}`)) {
             navigator.clipboard.writeText(notifyMsg);
