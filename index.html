@@ -45,15 +45,15 @@
     <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5 text-sm">
       <div class="flex justify-between text-gray-600 mb-1">
         <span>🎓 上課費用</span>
-        <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
+        <span class="font-semibold text-gray-800">NT\$ <span id="courseFee">0</span></span>
       </div>
       <div class="flex justify-between text-gray-600 mb-1">
-        <span>🏋️️‍♂️ 場地費用</span>
-        <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
+        <span>🏋️‍♂️ 場地費用</span>
+        <span class="font-semibold text-gray-800">NT\$ <span id="venueFee">0</span></span>
       </div>
       <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
         <span>合計總費用</span>
-        <span class="text-green-700">NT <span id="totalFee">0</span></span>
+        <span class="text-green-700">NT\$ <span id="totalFee">0</span></span>
       </div>
     </div>
 
@@ -85,7 +85,6 @@
 
   <script>
     const LIFF_ID = "2011814195-BxeoylZA"; 
-    // 最新 GAS Web App URL
     const GAS_URL = "https://script.google.com/macros/s/AKfycby5pg9LCeT9VC-5qs7lKnoRC6MdJuC6KiRjUjNI53NmFtxCynjbZqK8IWo_nviQDjBF/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -128,9 +127,13 @@
           document.getElementById('venueFee').innerText = venue.toLocaleString();
           document.getElementById('totalFee').innerText = (course + venue).toLocaleString();
 
+          // 控制可預約區域顯示
           if (!data.allowSelfBooking) {
             document.getElementById('bookingArea').classList.add('hidden');
             document.getElementById('bookingDisabledArea').classList.remove('hidden');
+          } else {
+            document.getElementById('bookingArea').classList.remove('hidden');
+            document.getElementById('bookingDisabledArea').classList.add('hidden');
           }
         } else {
           document.getElementById('studentName').innerText = "查無學員資料";
