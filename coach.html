@@ -13,7 +13,7 @@
     <!-- 頂部標題與重新整理 -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">🏋‍♂️ 教練端學員管理後台</h1>
+        <h1 class="text-2xl font-bold text-gray-800">🏋️‍♂️ 教練端學員管理後台</h1>
         <p class="text-xs text-gray-500 mt-1">即時排課、通知傳送與自主約課權限控制</p>
       </div>
       <button onclick="loadData()" class="bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold py-2 px-4 border border-gray-300 rounded-xl shadow-sm transition">
@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <!-- 今天與近期排課歷程看板 (支援一鍵變更上課地點) -->
+    <!-- 今天與近期排課歷程看板 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
       <h2 class="font-bold text-gray-800 text-base mb-3 flex items-center justify-between">
         <span>🗓 近期已預約課程看板</span>
@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <!-- 教練直接幫學員排課區塊 (包含地點選單) -->
+    <!-- 教練直接幫學員排課區塊 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
       <h2 class="font-bold text-gray-800 text-base mb-2">✍️ 教練直接幫學員排課</h2>
       <p class="text-xs text-gray-400 mb-4">選取學員、地點與開放時段後自動扣課，並同步建立 Google 行事曆</p>
@@ -119,7 +119,7 @@
       </div>
     </div>
 
-    <!-- 學員名冊搜尋與自主約課權限控制列表 -->
+    <!-- 學員名冊搜尋與權限/儲值管理列表 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
         <h2 class="font-bold text-gray-800 text-lg">👥 學員名冊與約課權限</h2>
@@ -262,6 +262,51 @@
       }
     }
 
+    // 快捷續約儲值功能
+    async function openTopUpModal(studentId, name) {
+      const addLessonsStr = prompt(`【${name} 課堂續約儲值】\n請輸入欲「增加」的堂數（例如：10）：`, "10");
+      if (addLessonsStr === null) return;
+      const addLessons = Number(addLessonsStr);
+      if (isNaN(addLessons) || addLessons <= 0) {
+        alert("❌ 請輸入有效的數字（必須大於 0）！");
+        return;
+      }
+
+      const addCourseFeeStr = prompt(`請輸入本次新繳的「上課費用 NT」（若無請填 0）：`, "0");
+      if (addCourseFeeStr === null) return;
+      const addCourseFee = Number(addCourseFeeStr) || 0;
+
+      const addVenueFeeStr = prompt(`請輸入本次新繳的「場地費用 NT」（若無請填 0）：`, "0");
+      if (addVenueFeeStr === null) return;
+      const addVenueFee = Number(addVenueFeeStr) || 0;
+
+      if (!confirm(`確認要為【${name}】儲值以下內容嗎？\n\n➕ 增加堂數：${addLessons} 堂\n🎓 新增上課費：NT ${addCourseFee.toLocaleString()}\n🏋️‍♂️ 新增場地費：NT ${addVenueFee.toLocaleString()}`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'topUpStudent',
+            studentId: studentId,
+            addLessons: addLessons,
+            addCourseFee: addCourseFee,
+            addVenueFee: addVenueFee
+          })
+        });
+        const result = await res.json();
+        if (result && result.success) {
+          alert(`🎉 ${result.message}`);
+          loadData();
+        } else {
+          alert(`❌ 儲值失敗：${result ? result.message : '未知錯誤'}`);
+        }
+      } catch (e) {
+        alert("網路連線錯誤，請重試");
+      }
+    }
+
     function populateStudentDropdown(students) {
       const select = document.getElementById('coachSelectStudent');
       select.innerHTML = '<option value="">-- 請選擇學員 --</option>';
@@ -393,9 +438,14 @@
               場地費: <span class="font-semibold text-gray-800">NT ${Number(student.venueFee).toLocaleString()}</span> 
               <span class="font-bold text-green-700 ml-1">(總計: NT ${totalFee.toLocaleString()})</span>
             </div>
-            <button onclick="copyLiffLink('${studentLiffLink}', '${student.name}')" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs">
-              📋 複製約課連結
-            </button>
+            <div class="flex space-x-2 w-full sm:w-auto">
+              <button onclick="openTopUpModal('${student.studentId}', '${student.name}')" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs">
+                💳 續約儲值
+              </button>
+              <button onclick="copyLiffLink('${studentLiffLink}', '${student.name}')" class="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition shadow-sm text-xs">
+                📋 複製約課連結
+              </button>
+            </div>
           </div>
         `;
         container.appendChild(card);
