@@ -16,6 +16,16 @@
       <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
     </div>
 
+    <!-- 最近上課提醒卡片 (最近, 今天, 明天) -->
+    <div id="upcomingSection" class="hidden mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-xs uppercase font-bold tracking-wider opacity-80">🗓️ 下一堂預約課程</span>
+        <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">近期</span>
+      </div>
+      <div class="text-xl font-black" id="upcomingTime">--</div>
+      <div class="text-xs mt-1 opacity-90" id="upcomingDetail">已排入教練行程</div>
+    </div>
+
     <!-- 堂數資訊卡片 (顯示 剩餘堂數 / 總堂數) -->
     <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl border border-green-100 mb-4 shadow-sm">
       <div class="flex justify-between items-center mb-1">
@@ -26,39 +36,48 @@
         <span class="text-sm font-medium text-gray-600">剩餘堂數 / 總堂數</span>
         <span class="text-2xl font-black text-green-700"><span id="remaining">--</span> / <span id="total">--</span> <span class="text-sm font-normal text-gray-500">堂</span></span>
       </div>
-      <!-- 堂數條狀示意圖 -->
       <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
         <div id="progressBar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
       </div>
     </div>
 
-    <!-- 費用明細卡片 (上課費用 & 場地費用) -->
-    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5">
-      <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 flex items-center">
-        <span>💰 課程費用明細</span>
-      </h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between text-gray-600">
-          <span>🎓 教練費</span>
-          <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
-        </div>
-        <div class="flex justify-between text-gray-600">
-          <span>🏋️‍♂️ 租場費</span>
-          <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
-        </div>
-        <div class="border-t border-gray-200 pt-2 flex justify-between font-bold text-gray-900 text-base">
-          <span>合計總費用</span>
-          <span class="text-green-700">NT <span id="totalFee">0</span></span>
-        </div>
+    <!-- 費用明細卡片 -->
+    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-5 text-sm">
+      <div class="flex justify-between text-gray-600 mb-1">
+        <span>🎓 上課費用</span>
+        <span class="font-semibold text-gray-800">NT\$ <span id="courseFee">0</span></span>
+      </div>
+      <div class="flex justify-between text-gray-600 mb-1">
+        <span>🏋️‍♂️ 場地費用</span>
+        <span class="font-semibold text-gray-800">NT\$ <span id="venueFee">0</span></span>
+      </div>
+      <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
+        <span>合計總費用</span>
+        <span class="text-green-700">NT\$ <span id="totalFee">0</span></span>
       </div>
     </div>
 
-    <!-- 可約時段列表 -->
-    <div class="mb-2">
-      <h2 class="font-bold text-gray-800 text-base mb-1">請選擇可預約時段：</h2>
-      <p class="text-xs text-gray-400 mb-3">時段確認後即自動完成預約與扣課</p>
-      <div id="slotList" class="space-y-2">
-        <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-400 text-sm">時段載入中...</div>
+    <!-- 約課區塊 (含自主約課權限判定) -->
+    <div class="mb-6">
+      <h2 class="font-bold text-gray-800 text-base mb-1">📅 可預約時段：</h2>
+      <div id="bookingArea">
+        <p class="text-xs text-gray-400 mb-3">點選時段後即自動完成核銷與預約</p>
+        <div id="slotList" class="space-y-2">
+          <div class="p-4 bg-gray-50 rounded-xl text-center text-gray-400 text-sm">時段載入中...</div>
+        </div>
+      </div>
+      <!-- 權限關閉提示 -->
+      <div id="bookingDisabledArea" class="hidden p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm">
+        <p class="font-bold mb-1">🔒 目前由教練統一為您排課</p>
+        <p class="text-xs text-amber-700">自主約課功能已由教練暫時關閉。如有改期或預約需求，請直接在 LINE 告知教練即可！</p>
+      </div>
+    </div>
+
+    <!-- 歷史約課紀錄歷程 -->
+    <div class="border-t pt-4">
+      <h3 class="font-bold text-gray-700 text-sm mb-3">📋 上課紀錄歷程</h3>
+      <div id="historyList" class="space-y-2 max-h-40 overflow-y-auto">
+        <p class="text-xs text-gray-400 text-center py-2">載入紀錄中...</p>
       </div>
     </div>
 
@@ -66,7 +85,7 @@
 
   <script>
     const LIFF_ID = "2011814195-BxeoylZA"; 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby5pg9LCeT9VC-5qs7lKnoRC6MdJuC6KiRjUjNI53NmFtxCynjbZqK8IWo_nviQDjBF/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby3lgINctsdKYrPBOLVt3GtGd8dtj4-0-0Q8K3iSlK9fvulWJIMW3bjoUDyfJAgKgXm/exec";
 
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -80,14 +99,13 @@
           return;
         }
         await loadStudentData();
+        await loadBookings();
         await loadSlots();
       } catch (err) {
         console.error("LIFF 初始化失敗:", err);
-        document.getElementById('studentName').innerText = "系統連線異常";
       }
     }
 
-    // 讀取學員資料、堂數與費用明細
     async function loadStudentData() {
       try {
         const res = await fetch(`${GAS_URL}?action=getStudentData&token=${token}`);
@@ -97,28 +115,83 @@
           document.getElementById('remaining').innerText = data.remaining;
           document.getElementById('total').innerText = data.total;
 
-          // 計算剩餘進度條 %
           const total = Number(data.total) || 1;
           const remaining = Number(data.remaining) || 0;
           const percent = Math.min(Math.round((remaining / total) * 100), 100);
           document.getElementById('lessonPercentage').innerText = `${percent}%`;
           document.getElementById('progressBar').style.width = `${percent}%`;
 
-          // 顯示費用明細
           const course = Number(data.courseFee) || 0;
           const venue = Number(data.venueFee) || 0;
           document.getElementById('courseFee').innerText = course.toLocaleString();
           document.getElementById('venueFee').innerText = venue.toLocaleString();
           document.getElementById('totalFee').innerText = (course + venue).toLocaleString();
-        } else {
-          document.getElementById('studentName').innerText = "查無學員資料";
+
+          // 權限判斷：是否允許自主約課
+          if (!data.allowSelfBooking) {
+            document.getElementById('bookingArea').classList.add('hidden');
+            document.getElementById('bookingDisabledArea').classList.remove('hidden');
+          }
         }
       } catch (e) {
-        console.error("無法取得學員資料:", e);
+        console.error(e);
       }
     }
 
-    // 讀取開放預約時段
+    // 載入預約紀錄 (提取最近課程)
+    async function loadBookings() {
+      try {
+        const res = await fetch(`${GAS_URL}?action=getStudentBookings&token=${token}`);
+        const data = await res.json();
+        
+        if (data.success) {
+          // 渲染最靠近的下一堂課
+          if (data.upcoming && data.upcoming.length > 0) {
+            const next = data.upcoming[0];
+            const upcomingSec = document.getElementById('upcomingSection');
+            upcomingSec.classList.remove('hidden');
+            document.getElementById('upcomingTime').innerText = `${next.date} ${next.time}`;
+            
+            // 標籤提示：今天、明天或近期
+            const todayStr = new Date().toISOString().split('T')[0];
+            const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            if (next.date === todayStr) {
+              document.getElementById('upcomingBadge').innerText = "🔥 今天上課";
+            } else if (next.date === tomorrowStr) {
+              document.getElementById('upcomingBadge').innerText = "⚡ 明天上課";
+            } else {
+              document.getElementById('upcomingBadge').innerText = "近期課程";
+            }
+          }
+
+          // 渲染歷史歷程
+          const historyContainer = document.getElementById('historyList');
+          historyContainer.innerHTML = '';
+          const allList = [...(data.upcoming || []), ...(data.past || [])];
+          
+          if (allList.length === 0) {
+            historyContainer.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">尚無上課紀錄</p>';
+            return;
+          }
+
+          allList.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center text-xs p-2.5 bg-gray-50 rounded-lg border border-gray-100";
+            div.innerHTML = `
+              <div>
+                <span class="font-bold text-gray-800">${item.date} ${item.time}</span>
+                <span class="text-gray-400 ml-1">(${item.bookedBy})</span>
+              </div>
+              <span class="text-green-600 font-semibold">已確認</span>
+            `;
+            historyContainer.appendChild(div);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     async function loadSlots() {
       try {
         const res = await fetch(`${GAS_URL}?action=getAvailableSlots`);
@@ -133,7 +206,7 @@
 
         slots.forEach(slot => {
           const btn = document.createElement('button');
-          btn.className = "w-full bg-white hover:bg-green-50 text-gray-800 border border-gray-200 hover:border-green-400 font-semibold py-3 px-4 rounded-xl flex justify-between items-center shadow-sm transition duration-150";
+          btn.className = "w-full bg-white hover:bg-green-50 text-gray-800 border border-gray-200 hover:border-green-400 font-semibold py-3 px-4 rounded-xl flex justify-between items-center shadow-sm transition";
           btn.innerHTML = `
             <div class="flex items-center space-x-2">
               <span class="text-green-600">📅</span>
@@ -145,12 +218,10 @@
           container.appendChild(btn);
         });
       } catch (e) {
-        console.error("無法載入時段:", e);
-        document.getElementById('slotList').innerHTML = '<p class="text-red-500 text-sm">載入時段失敗，請稍後重試。</p>';
+        console.error(e);
       }
     }
 
-    // 執行預約並於 LINE 聊天室帶出訊息
     async function book(slotId, timeText) {
       if (!confirm(`確定要預約 ${timeText} 嗎？`)) return;
 
@@ -166,7 +237,7 @@
           if (liff.isLoggedIn() && liff.isInClient()) {
             await liff.sendMessages([{
               type: 'text',
-              text: `🤖 ${slotId}教練，我已預約了 ${timeText} 的課程！`
+              text: `🤖 [系統紀錄] 我已預約了 ${timeText} 的課程！`
             }]);
           }
           liff.closeWindow();
