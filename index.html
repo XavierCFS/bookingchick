@@ -16,7 +16,7 @@
       <span id="statusBadge" class="text-xs bg-green-100 text-green-700 font-medium px-2.5 py-0.5 rounded-full">LINE 連線中</span>
     </div>
 
-    <!-- 最近上課提醒卡片 (含地點與導航行事曆) -->
+    <!-- 最近上課提醒卡片 (優先讀取與顯示) -->
     <div id="upcomingSection" class="mb-4 p-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl text-white shadow-md">
       <div class="flex justify-between items-center mb-2">
         <span id="upcomingBadge" class="text-xs bg-white text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full">載入中</span>
@@ -54,7 +54,7 @@
         <span class="font-semibold text-gray-800">NT <span id="courseFee">0</span></span>
       </div>
       <div class="flex justify-between text-gray-600 mb-1">
-        <span>🏋️‍♂️ 場地費用</span>
+        <span>🏋️️‍♂️ 場地費用</span>
         <span class="font-semibold text-gray-800">NT <span id="venueFee">0</span></span>
       </div>
       <div class="border-t border-gray-200 pt-1.5 flex justify-between font-bold text-gray-900">
@@ -131,7 +131,6 @@
       return str.replace(/-/g, '/');
     }
 
-    // 產生帶有 Google 地圖導航座標的 Google 行事曆連結
     function generateGoogleCalendarUrl(title, dateStr, timeStr, location, details) {
       try {
         const formattedDate = cleanDateStr(dateStr);
@@ -169,7 +168,7 @@
           action: "TEMPLATE",
           text: title,
           dates: `${startIso}/${endIso}`,
-          location: location || '', // 帶入地點，手機打開可直接導航
+          location: location || '',
           details: details || '',
           ctz: "Asia/Taipei"
         });
@@ -234,7 +233,6 @@
             upcomingTime.innerText = `${displayDate} ${next.time}`;
             upcomingLocation.innerText = locText;
             
-            // 帶入 Location 生成 Google 日曆按鈕
             const calUrl = generateGoogleCalendarUrl(
               "🏋️‍♂️ 私人教練健身課",
               displayDate,
