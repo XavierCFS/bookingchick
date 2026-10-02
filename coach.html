@@ -40,14 +40,14 @@
     <!-- 今天與近期排課歷程看板 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
       <h2 class="font-bold text-gray-800 text-base mb-3 flex items-center">
-        <span>🗓️ 近期已預約課程 (今天/明天/未來)</span>
+        <span>🗓️ 近期已預約課程</span>
       </h2>
       <div id="upcomingBookingList" class="space-y-2 max-h-48 overflow-y-auto">
         <div class="text-center py-4 text-gray-400 text-sm">載入中...</div>
       </div>
     </div>
 
-    <!-- 【核心新功能】教練幫學員排課區塊 -->
+    <!-- 教練直接幫學員排課區塊 -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 p-5">
       <h2 class="font-bold text-gray-800 text-base mb-2">✍️ 教練直接幫學員排課</h2>
       <p class="text-xs text-gray-400 mb-4">選取學員與開放時段後自動扣課，並產生 LINE 通知簡訊供複製傳送</p>
@@ -67,7 +67,7 @@
         </div>
       </div>
       <button onclick="submitCoachBooking()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-md transition">
-        確定為學員排課 (+自動同步 Google 日曆)
+        確定為學員排課 並 同步Google日曆
       </button>
     </div>
 
@@ -85,7 +85,7 @@
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">專屬 Token (驗證碼) *</label>
-            <input type="text" id="newToken" placeholder="可留空自動生成" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-green-500 outline-none">
+            <input type="text" id="newToken" placeholder="可留空自動生成" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none">
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">購買總堂數</label>
@@ -145,7 +145,6 @@
       await loadCoachBookings();
     }
 
-    // 載入全體學員
     async function loadStudents() {
       try {
         const res = await fetch(`${GAS_URL}?action=getCoachStudents`);
@@ -161,7 +160,6 @@
       }
     }
 
-    // 載入開放時段
     async function loadSlots() {
       try {
         const res = await fetch(`${GAS_URL}?action=getAvailableSlots`);
@@ -172,7 +170,6 @@
       }
     }
 
-    // 載入近期所有學員的預約
     async function loadCoachBookings() {
       const container = document.getElementById('upcomingBookingList');
       try {
@@ -185,8 +182,8 @@
             return;
           }
           
-          const todayStr = new Date().toISOString().split('T')[0];
-          const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+          const todayStr = new Date().toISOString().split('T')[0]; // 已修正 [0]
+          const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0]; // 已修正 [0]
 
           data.upcoming.forEach(b => {
             let badgeText = "近期";
@@ -233,7 +230,6 @@
       });
     }
 
-    // 教練幫學員排課
     async function submitCoachBooking() {
       const token = document.getElementById('coachSelectStudent').value;
       const slotId = document.getElementById('coachSelectSlot').value;
@@ -266,7 +262,6 @@
       }
     }
 
-    // 切換自主約課權限
     async function togglePermission(studentId, currentAllow) {
       const targetAllow = !currentAllow;
       const confirmMsg = targetAllow ? 
