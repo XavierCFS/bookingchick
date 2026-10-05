@@ -11,23 +11,23 @@
 
   <div class="max-w-5xl mx-auto space-y-6">
     
-    <!-- 頂部頁首標題 -->
+    <!-- 頁首 -->
     <div class="flex justify-between items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200/60">
       <div>
-        <h1 class="text-2xl font-black text-slate-800">🏋️️‍♂️ 教練專屬管理後台</h1>
-        <p class="text-xs text-slate-400 mt-0.5">學員審核、Top 3 意願確刻與期數帳務紀錄</p>
+        <h1 class="text-2xl font-black text-slate-800">🏋️‍♂️ 教練專屬管理後台</h1>
+        <p class="text-xs text-slate-400 mt-0.5">學員意願審核、排課管理與確認完課核銷</p>
       </div>
       <button onclick="loadData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-2xl text-xs transition">
         🔄 重新整理
       </button>
     </div>
 
-    <!-- 頂部意願審核看板 (Top 3 Proposal Review) -->
+    <!-- 1. 學員 Top 3 意願待審核看板 -->
     <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 text-white shadow-xl space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-base font-bold flex items-center space-x-2">
           <i class="fa-solid fa-calendar-check text-emerald-400"></i>
-          <span>學員 Top 3 約課意願待審核看板</span>
+          <span>學員 Top 3 約課意願待審核</span>
         </h2>
         <span class="text-xs bg-white/10 px-3 py-1 rounded-full text-slate-300" id="proposalCountText">0 筆待審核</span>
       </div>
@@ -36,7 +36,21 @@
       </div>
     </div>
 
-    <!-- 學員名冊與期數管理列表 -->
+    <!-- 2. 已排課系統看板 (可【變更時間】與【確認完課】) -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="font-bold text-slate-800 text-lg flex items-center space-x-2">
+          <i class="fa-solid fa-clock text-blue-600"></i>
+          <span>📅 當前排課系統（已排課待上課）</span>
+        </h2>
+        <span class="text-xs text-slate-400">上完課點擊【確認完課】後才會自動扣課</span>
+      </div>
+      <div id="scheduledBoard" class="space-y-2">
+        <div class="text-center py-4 text-slate-400 text-xs">載入排課資料中...</div>
+      </div>
+    </div>
+
+    <!-- 3. 學員名冊與期數管理列表 -->
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/60 space-y-4">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
         <h2 class="font-bold text-slate-800 text-lg">👥 學員名冊與期數帳務</h2>
@@ -50,7 +64,37 @@
 
   </div>
 
-  <!-- 新增期數彈窗 (Add New Package Modal) -->
+  <!-- 變更時間彈窗 -->
+  <div id="updateModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4">
+      <h3 class="text-lg font-bold text-slate-800">✏️ 變更上課時間或地點</h3>
+      <input type="hidden" id="editBookingId">
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-600 mb-1">新上課日期 *</label>
+          <input type="date" id="editDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1">新上課時間 *</label>
+          <input type="time" id="editTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none">
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-1">新上課地點 *</label>
+          <select id="editLocation" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none">
+            <option value="賽特體適能中華總店">📍 賽特體適能中華總店</option>
+            <option value="賽特體適能同盟店">📍 賽特體適能同盟店</option>
+            <option value="待教練確認">❓ 待教練確認</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex space-x-2">
+        <button onclick="document.getElementById('updateModal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-xs">取消</button>
+        <button onclick="submitUpdateBooking()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">儲存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增期數彈窗 -->
   <div id="packageModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4">
       <h3 class="text-lg font-bold text-slate-800">➕ 為學員新增新期數</h3>
@@ -97,6 +141,7 @@
         if (data && data.success) {
           dashboardData = data;
           renderProposals(data.proposals || []);
+          renderScheduledBoard(data.scheduledBookings || []);
           renderStudents(data.students || []);
         }
       } catch (e) {
@@ -124,11 +169,42 @@
           </div>
           <div class="text-slate-200">
             <div>📍 偏好地點：${p.location}</div>
-            <div class="font-semibold text-white mt-1">選定時間：${p.selectedDate} ${p.selectedTime}</div>
+            <div class="font-semibold text-white mt-1">選定時間 (Top ${p.rank})：${p.selectedDate} ${p.selectedTime}</div>
           </div>
           <button onclick="confirmProposal('${p.studentId}', '${p.selectedDate}', '${p.selectedTime}', '${p.location}')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold py-2 rounded-xl transition">
-            確定此時段排課 (+自動 FIFO 扣課)
+            確認此時間進入排課系統 (尚未扣課)
           </button>
+        `;
+        board.appendChild(div);
+      });
+    }
+
+    function renderScheduledBoard(scheduled) {
+      const board = document.getElementById('scheduledBoard');
+      board.innerHTML = '';
+
+      if (scheduled.length === 0) {
+        board.innerHTML = '<div class="text-slate-400 text-xs py-3 text-center">目前無已排課待上課紀錄。</div>';
+        return;
+      }
+
+      scheduled.forEach(b => {
+        const div = document.createElement('div');
+        div.className = "flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 gap-2";
+        div.innerHTML = `
+          <div>
+            <span class="font-bold text-slate-800 text-sm">${b.studentName}</span>
+            <span class="text-slate-500 ml-2">📅 ${b.date} ${b.time}</span>
+            <span class="text-slate-400 ml-1">📍 ${b.location}</span>
+          </div>
+          <div class="flex space-x-2 w-full sm:w-auto">
+            <button onclick="openUpdateModal('${b.bookingId}', '${b.date}', '${b.time}', '${b.location}')" class="flex-1 sm:flex-none bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-1.5 rounded-xl transition">
+              ✏️ 變更時間
+            </button>
+            <button onclick="completeBooking('${b.bookingId}', '${b.studentName}')" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-sm">
+              ✅ 確認完課 (扣1堂)
+            </button>
+          </div>
         `;
         board.appendChild(div);
       });
@@ -139,6 +215,11 @@
       container.innerHTML = '';
 
       students.forEach(s => {
+        let pkgHtml = '無期數資料';
+        if (s.packages && s.packages.length > 0) {
+          pkgHtml = s.packages.map(p => `• 第 ${p.termNumber} 期：剩餘 ${p.remainingLessons} / ${p.totalLessons} 堂 (NT$ ${p.coachFee.toLocaleString()})`).join('<br>');
+        }
+
         const card = document.createElement('div');
         card.className = "border border-slate-200 rounded-2xl p-4 bg-white space-y-3";
         card.innerHTML = `
@@ -148,20 +229,70 @@
               <span class="text-xs text-slate-400 ml-2">ID: <code>${s.studentId}</code> (${s.phone})</span>
             </div>
             <div class="flex space-x-2">
-              <button onclick="openPackageModal('${s.studentId}')" class="bg-blue-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-sm">
+              <button onclick="openPackageModal('${s.studentId}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow-sm">
                 ➕ 添加新期數
               </button>
             </div>
           </div>
           <div class="text-xs text-slate-600 space-y-1">
             <div class="font-semibold">購買期數明細：</div>
-            <div id="pkgDetails_${s.studentId}" class="pl-2 space-y-1 text-slate-500">
-              ${s.packages ? s.packages.map(p => `• 第 \${p.termNumber} 期：剩餘 \\({p.remainingLessons}/\\){p.totalLessons} 堂 (NT\$ \${p.coachFee})`).join('<br>') : '無期數資料'}
-            </div>
+            <div class="pl-2 space-y-1 text-slate-500">${pkgHtml}</div>
           </div>
         `;
         container.appendChild(card);
       });
+    }
+
+    function openUpdateModal(bookingId, date, time, location) {
+      document.getElementById('editBookingId').value = bookingId;
+      document.getElementById('editDate').value = date ? date.replace(/\//g, '-') : '';
+      document.getElementById('editTime').value = time || '';
+      document.getElementById('editLocation').value = location || '賽特體適能中華總店';
+      document.getElementById('updateModal').classList.remove('hidden');
+    }
+
+    async function submitUpdateBooking() {
+      const payload = {
+        action: 'updateBooking',
+        bookingId: document.getElementById('editBookingId').value,
+        date: document.getElementById('editDate').value.replace(/-/g, '/'),
+        time: document.getElementById('editTime').value,
+        location: document.getElementById('editLocation').value
+      };
+
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        if (result && result.success) {
+          alert("🎉 " + result.message);
+          document.getElementById('updateModal').classList.add('hidden');
+          loadData();
+        }
+      } catch (e) {
+        alert("修改失敗");
+      }
+    }
+
+    async function completeBooking(bookingId, studentName) {
+      if (!confirm(`確定要為【${studentName}】確認完課並扣除 1 堂課嗎？`)) return;
+
+      const payload = {
+        action: 'completeBooking',
+        bookingId: bookingId
+      };
+
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const result = await res.json();
+        if (result && result.success) {
+          alert(result.message);
+          loadData();
+        } else {
+          alert("❌ " + result.message);
+        }
+      } catch (e) {
+        alert("核銷失敗");
+      }
     }
 
     function openPackageModal(studentId) {
@@ -194,8 +325,6 @@
     }
 
     async function confirmProposal(studentId, date, time, location) {
-      if (!confirm(`確定要為【${studentId}】排定 ${date} ${time} 的課程嗎？`)) return;
-
       const payload = {
         action: 'confirmProposal',
         studentId: studentId,
