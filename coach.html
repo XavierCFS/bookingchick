@@ -83,7 +83,7 @@
     </div>
   </div>
 
-  <!-- 新增預約/變更時間彈窗 (時間限制整點/半點) -->
+  <!-- 新增預約/變更時間彈窗 -->
   <div id="scheduleModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4">
       <h3 class="text-lg font-bold text-slate-800" id="scheduleModalTitle">📅 安排課程預約</h3>
@@ -348,7 +348,7 @@
       document.getElementById('schStudentId').value = studentId;
       document.getElementById('schBookingId').value = '';
       document.getElementById('scheduleModalTitle').innerText = `📅 為【${name}】新增預約`;
-      document.getElementById('schDate').value = new Date().toISOString().split('T');
+      document.getElementById('schDate').value = new Date().toISOString().split('T')[0];
       document.getElementById('scheduleModal').classList.remove('hidden');
     }
 
@@ -426,7 +426,7 @@
 
     function openPackageModal(studentId) {
       document.getElementById('modalStudentId').value = studentId;
-      document.getElementById('pkgDate').value = new Date().toISOString().split('T');
+      document.getElementById('pkgDate').value = new Date().toISOString().split('T')[0];
       document.getElementById('pkgIsTrial').checked = false;
       toggleTrialOption();
       document.getElementById('packageModal').classList.remove('hidden');
