@@ -11,7 +11,7 @@
 
   <div class="max-w-5xl mx-auto space-y-6">
     
-    <!-- 頁首：Allen教練的課程管理 -->
+    <!-- 頁首 -->
     <div class="flex justify-between items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200/60">
       <div>
         <h1 class="text-2xl font-black text-slate-800">Allen教練的課程管理</h1>
@@ -50,7 +50,7 @@
 
   </div>
 
-  <!-- 學員詳細資料與期數彈窗 (點姓名觸發) -->
+  <!-- 學員詳細資料與期數彈窗 -->
   <div id="studentDetailModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-3">
@@ -64,7 +64,6 @@
         <div>👤 性別/生日：<span id="mStudentMeta">--</span></div>
       </div>
 
-      <!-- 購買期數明細 -->
       <div class="space-y-2">
         <div class="flex justify-between items-center">
           <h4 class="font-bold text-xs text-slate-800">💳 購買期數明細</h4>
@@ -73,7 +72,6 @@
         <div id="mPackageList" class="space-y-2 text-xs"></div>
       </div>
 
-      <!-- 備註筆記 -->
       <div class="space-y-2 pt-2 border-t">
         <h4 class="font-bold text-xs text-slate-800">📝 備註筆記</h4>
         <div id="mNoteList" class="bg-slate-50 p-2.5 rounded-xl space-y-1 max-h-28 overflow-y-auto text-xs text-slate-600"></div>
@@ -85,7 +83,7 @@
     </div>
   </div>
 
-  <!-- 直接新增預約/變更時間彈窗 -->
+  <!-- 新增預約/變更時間彈窗 (時間限制整點/半點) -->
   <div id="scheduleModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4">
       <h3 class="text-lg font-bold text-slate-800" id="scheduleModalTitle">📅 安排課程預約</h3>
@@ -98,7 +96,7 @@
         </div>
         <div>
           <label class="block text-slate-600 mb-1">上課時間 *</label>
-          <input type="time" id="schTime" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none">
+          <select id="schTime" class="time-select w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none"></select>
         </div>
         <div>
           <label class="block text-slate-600 mb-1">上課地點 *</label>
@@ -116,10 +114,16 @@
     </div>
   </div>
 
-  <!-- 新增期數彈窗 -->
+  <!-- 新增期數彈窗 (支援「設為體驗課」選項) -->
   <div id="packageModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4">
-      <h3 class="text-lg font-bold text-slate-800">➕ 為學員新增新期數</h3>
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-bold text-slate-800">➕ 新增課程期數</h3>
+        <label class="flex items-center space-x-1.5 cursor-pointer bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl text-xs font-bold text-amber-800">
+          <input type="checkbox" id="pkgIsTrial" onchange="toggleTrialOption()" class="w-4 h-4 accent-amber-600">
+          <span>🎁 設為體驗課</span>
+        </label>
+      </div>
       <input type="hidden" id="modalStudentId">
       <div class="space-y-3 text-xs">
         <div>
@@ -141,13 +145,14 @@
               <option value="轉帳">轉帳</option>
               <option value="現金">現金</option>
               <option value="刷卡">刷卡</option>
+              <option value="體驗課免費">體驗課免費</option>
             </select>
           </div>
         </div>
       </div>
       <div class="flex space-x-2">
         <button onclick="document.getElementById('packageModal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-2.5 rounded-xl text-xs">取消</button>
-        <button onclick="submitNewPackage()" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">確認新增期數</button>
+        <button onclick="submitNewPackage()" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md">確認新增</button>
       </div>
     </div>
   </div>
@@ -157,7 +162,20 @@
     let dashboardData = null;
     let selectedStudent = null;
 
+    function initTimeSelects() {
+      const selects = document.querySelectorAll('.time-select');
+      selects.forEach(sel => {
+        sel.innerHTML = '<option value="">請選擇時間 (整點/半點)</option>';
+        for (let h = 8; h <= 22; h++) {
+          const hh = String(h).padStart(2, '0');
+          sel.innerHTML += `<option value="${hh}:00">${hh}:00</option>`;
+          if (h < 22) sel.innerHTML += `<option value="${hh}:30">${hh}:30</option>`;
+        }
+      });
+    }
+
     async function loadData() {
+      initTimeSelects();
       try {
         const res = await fetch(`${GAS_URL}?action=getCoachDashboard`);
         const data = await res.json();
@@ -212,6 +230,7 @@
       });
     }
 
+    // 渲染學員卡片 (加入【💬 通知學員】一鍵 LINE 通知按鈕)
     function renderStudents(students) {
       const container = document.getElementById('studentContainer');
       container.innerHTML = '';
@@ -228,8 +247,11 @@
                 <span class="text-slate-500 text-xs ml-1">📍 ${sch.location}</span>
               </div>
               <div class="flex space-x-1.5 w-full sm:w-auto">
-                <button onclick="openEditSchedule('${sch.bookingId}', '${s.studentId}', '${sch.date}', '${sch.time}', '${sch.location}')" class="flex-1 sm:flex-none bg-white border text-slate-700 font-bold px-2.5 py-1 rounded-xl text-xs">✏️ 變更時間</button>
-                <button onclick="completeBooking('${sch.bookingId}', '${s.name}')" class="flex-1 sm:flex-none bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-xl text-xs">✅ 確認完課 (扣1堂)</button>
+                <button onclick="notifyStudent('${s.name}', '${sch.date}', '${sch.time}', '${sch.location}')" class="flex-1 sm:flex-none bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-xl text-xs border border-emerald-300 hover:bg-emerald-200">
+                  💬 通知學員
+                </button>
+                <button onclick="openEditSchedule('${sch.bookingId}', '${s.studentId}', '${sch.date}', '${sch.time}', '${sch.location}')" class="flex-1 sm:flex-none bg-white border text-slate-700 font-bold px-2.5 py-1 rounded-xl text-xs">✏️ 變更</button>
+                <button onclick="completeBooking('${sch.bookingId}', '${s.name}')" class="flex-1 sm:flex-none bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-xl text-xs">✅ 完課</button>
               </div>
             </div>
           `;
@@ -260,6 +282,24 @@
       });
     }
 
+    // 一鍵複製與開啟 LINE 訊息通知學員
+    function notifyStudent(studentName, date, time, location) {
+      const msg = `Allen教練跟你約了一堂教練課\n時間：${date} ${time}\n地點：${location}`;
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(msg).then(() => {
+          const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
+          if (confirm(`已複製通知文字至剪貼簿！是否開啟 LINE 傳送給 ${studentName}？\n\n【通知內容】\n${msg}`)) {
+            window.open(lineShareUrl, '_blank');
+          }
+        }).catch(() => {
+          alert(`【通知內容】\n${msg}`);
+        });
+      } else {
+        alert(`【通知內容】\n${msg}`);
+      }
+    }
+
     function openStudentDetail(studentId) {
       selectedStudent = dashboardData.students.find(s => s.studentId === studentId);
       if (!selectedStudent) return;
@@ -277,10 +317,11 @@
         pkgBox.innerHTML = '<p class="text-slate-400">無期數紀錄。</p>';
       } else {
         selectedStudent.packages.forEach(p => {
+          const titleName = p.termNumber === 0 ? '體驗課' : `第${p.termNumber}期課`;
           pkgBox.innerHTML += `
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex justify-between items-center">
               <div>
-                <span class="font-bold text-slate-700">第${p.termNumber}期課</span>
+                <span class="font-bold text-slate-700">${titleName}</span>
                 <span class="text-slate-400 ml-1">(${p.paymentDate} ${p.paymentMethod})</span>
               </div>
               <span class="font-black text-emerald-600">剩餘 ${p.remainingLessons} / ${p.totalLessons} 堂 <span class="text-slate-400 font-normal">(NT$ ${p.coachFee.toLocaleString()})</span></span>
@@ -369,9 +410,24 @@
       } catch (e) { alert("核銷失敗"); }
     }
 
+    function toggleTrialOption() {
+      const isTrial = document.getElementById('pkgIsTrial').checked;
+      if (isTrial) {
+        document.getElementById('pkgLessons').value = 1;
+        document.getElementById('pkgFee').value = 0;
+        document.getElementById('pkgMethod').value = "體驗課免費";
+      } else {
+        document.getElementById('pkgLessons').value = 10;
+        document.getElementById('pkgFee').value = 15000;
+        document.getElementById('pkgMethod').value = "轉帳";
+      }
+    }
+
     function openPackageModal(studentId) {
       document.getElementById('modalStudentId').value = studentId;
       document.getElementById('pkgDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pkgIsTrial').checked = false;
+      toggleTrialOption();
       document.getElementById('packageModal').classList.remove('hidden');
     }
 
@@ -379,6 +435,7 @@
       const payload = {
         action: 'addNewPackage',
         studentId: document.getElementById('modalStudentId').value,
+        isTrial: document.getElementById('pkgIsTrial').checked,
         totalLessons: document.getElementById('pkgLessons').value,
         coachFee: document.getElementById('pkgFee').value,
         paymentDate: document.getElementById('pkgDate').value,
