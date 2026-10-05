@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>教練課程管理系統</title>
+  <title>Allen教練的課程管理</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -11,18 +11,18 @@
 
   <div class="max-w-5xl mx-auto space-y-6">
     
-    <!-- 頁首：標題與教練稱呼 -->
+    <!-- 頁首：Allen教練的課程管理 -->
     <div class="flex justify-between items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200/60">
       <div>
-        <h1 class="text-2xl font-black text-slate-800">🏋️‍♂️ 教練課程管理</h1>
-        <p class="text-xs font-semibold text-emerald-600 mt-0.5" id="headerCoachInfo">"賽特"教練 (張小明)</p>
+        <h1 class="text-2xl font-black text-slate-800">Allen教練的課程管理</h1>
+        <p class="text-xs font-semibold text-emerald-600 mt-0.5" id="headerCoachInfo">Allen教練 (劉立愷)</p>
       </div>
       <button onclick="loadData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-2xl text-xs transition">
         🔄 重新整理
       </button>
     </div>
 
-    <!-- 1. 學員 Top 3 意願待審核看板 (同一學員合併在同一個框格) -->
+    <!-- 1. 學員 Top 3 意願待審核看板 -->
     <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 text-white shadow-xl space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="text-base font-bold flex items-center space-x-2">
@@ -164,7 +164,7 @@
         if (data && data.success) {
           dashboardData = data;
           if (data.coach) {
-            document.getElementById('headerCoachInfo').innerText = `"${data.coach.nickname || '賽特'}"教練 (${data.coach.name || '張小明'})`;
+            document.getElementById('headerCoachInfo').innerText = `Allen教練 (${data.coach.name || '劉立愷'})`;
           }
           renderProposalsGrouped(data.proposalsGrouped || []);
           renderStudents(data.students || []);
@@ -174,7 +174,6 @@
       }
     }
 
-    // 將同位學員的 Top 3 意願合併在同一個框格卡片
     function renderProposalsGrouped(grouped) {
       const board = document.getElementById('proposalBoard');
       board.innerHTML = '';
@@ -213,7 +212,6 @@
       });
     }
 
-    // 渲染學員名單卡片 (外部放置「最新一期課程預約」與【➕ 新增預約】)
     function renderStudents(students) {
       const container = document.getElementById('studentContainer');
       container.innerHTML = '';
@@ -262,7 +260,6 @@
       });
     }
 
-    // 點擊學員姓名：開啟詳細面版 (包含「購買期數明細」)
     function openStudentDetail(studentId) {
       selectedStudent = dashboardData.students.find(s => s.studentId === studentId);
       if (!selectedStudent) return;
@@ -283,7 +280,7 @@
           pkgBox.innerHTML += `
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex justify-between items-center">
               <div>
-                <span class="font-bold text-slate-700">第 ${p.termNumber} 期</span>
+                <span class="font-bold text-slate-700">第${p.termNumber}期課</span>
                 <span class="text-slate-400 ml-1">(${p.paymentDate} ${p.paymentMethod})</span>
               </div>
               <span class="font-black text-emerald-600">剩餘 ${p.remainingLessons} / ${p.totalLessons} 堂 <span class="text-slate-400 font-normal">(NT$ ${p.coachFee.toLocaleString()})</span></span>
