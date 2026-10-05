@@ -74,7 +74,7 @@
           <i class="fa-solid fa-pen-to-square text-xs text-slate-400 group-hover:text-emerald-600"></i>
         </div>
         <div onclick="openCoachInfoModal()" class="cursor-pointer group flex items-center space-x-1 mt-1">
-          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100" id="headerCoachName">🏋️‍♂️ "賽特" 教練</span>
+          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100" id="headerCoachName">Allen教練</span>
           <i class="fa-solid fa-circle-info text-xs text-emerald-500"></i>
         </div>
       </div>
@@ -92,7 +92,7 @@
           <span>📅 加到 Google 日曆</span>
         </a>
       </div>
-      <div class="text-2xl font-black mb-1" id="upcomingTime">尚無預約課程</div>
+      <div class="text-2xl font-black mb-1" id="upcomingTime">尚無預預約課程</div>
       <div class="text-xs text-emerald-100 flex items-center space-x-1">
         <i class="fa-solid fa-location-dot"></i>
         <span>地點：<span id="upcomingLocation" class="font-bold underline">--</span></span>
@@ -180,14 +180,14 @@
 
   </div>
 
-  <!-- 教練資歷彈窗 (顯示：綽號 (本名)) -->
+  <!-- 教練資歷彈窗 (顯示：Allen (劉立愷)) -->
   <div id="coachModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-3 border border-slate-100">
       <div class="w-20 h-20 rounded-full bg-slate-200 mx-auto overflow-hidden shadow-md">
         <img id="modalCoachPhoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="w-full h-full object-cover">
       </div>
       <div>
-        <h3 class="text-lg font-black text-slate-800" id="modalCoachTitle">賽特 (張小明)</h3>
+        <h3 class="text-lg font-black text-slate-800" id="modalCoachTitle">Allen (劉立愷)</h3>
       </div>
       <div class="bg-slate-50 p-3.5 rounded-2xl text-xs text-slate-600 text-left leading-relaxed max-h-40 overflow-y-auto" id="modalCoachBio">
         教練資歷介紹載入中...
@@ -221,7 +221,7 @@
       }
     }
 
-    // 正確修復 Google 日曆 1 鍵加入 URL 生成器
+    // 正確格式化 Google 行事曆標題：【Allen教練課,第1期,第3堂】
     function generateGoogleCalendarUrl(title, dateStr, timeStr, location, details) {
       try {
         if (!dateStr) return "#";
@@ -282,27 +282,29 @@
       const coach = data.coach;
 
       document.getElementById('headerStudentName').innerText = `嗨！${student.name}`;
-      document.getElementById('headerCoachName').innerText = `🏋️️‍♂️ "${coach.nickname || coach.name}" 教練`;
+      document.getElementById('headerCoachName').innerText = `Allen教練`;
       document.getElementById('avatarLetter').innerText = student.name ? student.name.charAt(0) : '👤';
       document.getElementById('maxDaysText').innerText = coach.maxProposalDays || 30;
 
-      // 反轉為：綽號 (本名)
-      document.getElementById('modalCoachTitle').innerText = `${coach.nickname || '賽特'} (${coach.name || '張小明'})`;
-      document.getElementById('modalCoachBio').innerText = coach.bio || '專長私人私人教練體適能雕塑與健康管理。';
+      document.getElementById('modalCoachTitle').innerText = `${coach.nickname || 'Allen'} (${coach.name || '劉立愷'})`;
+      document.getElementById('modalCoachBio').innerText = coach.bio || '2026-NGP形體組冠軍，專長肌力訓練與體態雕塑。';
       if (coach.photoUrl) document.getElementById('modalCoachPhoto').src = coach.photoUrl;
 
-      // 區塊 1：最近課程與日曆連結
+      // 區塊 1：最近課程與動態日曆標題生成
       if (data.upcoming) {
         document.getElementById('upcomingTime').innerText = `${data.upcoming.date} ${data.upcoming.time}`;
         document.getElementById('upcomingLocation').innerText = data.upcoming.location || '待確認';
         document.getElementById('upcomingBadge').innerText = "近期課程";
         
+        // 動態日曆標題：Allen教練課,第1期,第3堂
+        const calTitle = `Allen教練課,第${data.upcoming.termNumber || 1}期,第${data.upcoming.lessonNumber || 1}堂`;
+        
         const calUrl = generateGoogleCalendarUrl(
-          "🏋️‍♂️ 私人教練健身課",
+          calTitle,
           data.upcoming.date,
           data.upcoming.time,
           data.upcoming.location,
-          `專屬教練課程\n時間：${data.upcoming.date} ${data.upcoming.time}\n地點：${data.upcoming.location}`
+          `Allen教練私人課程\n時間：${data.upcoming.date} ${data.upcoming.time}\n地點：${data.upcoming.location}`
         );
         const calBtn = document.getElementById('calBtn');
         calBtn.href = calUrl;
@@ -313,7 +315,7 @@
         document.getElementById('calBtn').classList.add('hidden');
       }
 
-      // 區塊 2：期數
+      // 區塊 2：改為「第1期課」
       const pkgContainer = document.getElementById('packageList');
       pkgContainer.innerHTML = '';
       if (!data.packages || data.packages.length === 0) {
@@ -328,7 +330,7 @@
           div.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-100 space-y-1.5";
           div.innerHTML = `
             <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-slate-700">第 ${pkg.termNumber} 期課程包</span>
+              <span class="font-bold text-slate-700">第${pkg.termNumber}期課</span>
               <span class="font-black text-emerald-600 text-sm">${rem} <span class="text-xs font-normal text-slate-400">/ ${total} 堂</span></span>
             </div>
             <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
