@@ -18,7 +18,7 @@
 
   <!-- 首次註冊引導彈窗 -->
   <div id="registerModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-40 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100 animate-fade-in">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100">
       <div class="text-center mb-5">
         <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl mb-2">
           <i class="fa-solid fa-user-plus"></i>
@@ -41,7 +41,7 @@
             <select id="regSex" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
               <option value="男">男</option>
               <option value="女">女</option>
-              <option value="不不透漏">不透漏</option>
+              <option value="不透漏">不透漏</option>
             </select>
           </div>
           <div>
@@ -57,16 +57,16 @@
           <input type="checkbox" id="regCalSync" checked class="w-5 h-5 accent-emerald-600">
         </div>
       </div>
-      <button onclick="submitRegistration()" class="mt-5 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition">
+      <button onclick="submitRegistration()" class="mt-5 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
         完成註冊並進入專屬頁面
       </button>
     </div>
   </div>
 
-  <!-- 學員主內容面板 -->
+  <!-- 學員主頁面 -->
   <div class="max-w-md mx-auto p-4 space-y-4">
     
-    <!-- 頂部頁首標題區 -->
+    <!-- 頁首標題區 -->
     <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 flex justify-between items-center">
       <div>
         <div onclick="openStudentProfileModal()" class="cursor-pointer group flex items-center space-x-2">
@@ -74,25 +74,22 @@
           <i class="fa-solid fa-pen-to-square text-xs text-slate-400 group-hover:text-emerald-600"></i>
         </div>
         <div onclick="openCoachInfoModal()" class="cursor-pointer group flex items-center space-x-1 mt-1">
-          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100" id="headerCoachName">🏋️‍♂️ 專屬教練</span>
+          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100" id="headerCoachName">🏋️‍♂️ "賽特" 教練</span>
           <i class="fa-solid fa-circle-info text-xs text-emerald-500"></i>
         </div>
       </div>
-      <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600 font-bold text-lg" id="avatarLetter">
+      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-inner" id="avatarLetter">
         👤
       </div>
     </div>
 
-    <!-- 第一區塊：最近一期上課提醒 -->
-    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-5 text-white shadow-xl shadow-emerald-600/20 relative overflow-hidden">
-      <div class="absolute -right-4 -bottom-4 text-white/10 text-8xl font-black">
-        <i class="fa-regular fa-clock"></i>
-      </div>
+    <!-- 區塊 1：最近一期上課提醒 -->
+    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden">
       <div class="flex justify-between items-center mb-3">
-        <span class="text-xs bg-white/20 backdrop-blur-md text-white font-bold px-3 py-1 rounded-full uppercase tracking-wider" id="upcomingBadge">近期課程</span>
+        <span class="text-xs bg-white/20 backdrop-blur-md text-white font-bold px-3 py-1 rounded-full" id="upcomingBadge">近期課程</span>
         <a id="calBtn" href="#" target="_blank" class="hidden text-xs bg-white text-emerald-800 font-extrabold px-3 py-1.5 rounded-xl shadow hover:bg-emerald-50 transition flex items-center space-x-1">
           <i class="fa-solid fa-calendar-plus"></i>
-          <span>加到日曆</span>
+          <span>📅 加到 Google 日曆</span>
         </a>
       </div>
       <div class="text-2xl font-black mb-1" id="upcomingTime">尚無預約課程</div>
@@ -102,7 +99,7 @@
       </div>
     </div>
 
-    <!-- 第二區塊：期數 / 剩餘堂數 / 總堂數 (多期數卡片) -->
+    <!-- 區塊 2：購買期數與堂數進度 -->
     <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-3">
       <div class="flex justify-between items-center">
         <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
@@ -116,7 +113,7 @@
       </div>
     </div>
 
-    <!-- 第三區塊：最近 30 天想約時間 Top 3 提出 -->
+    <!-- 區塊 3：預約意願時間 Top 3 -->
     <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-4">
       <div>
         <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
@@ -126,7 +123,6 @@
         <p class="text-xs text-slate-400 mt-0.5">選擇未來 <span id="maxDaysText">30</span> 天內您方便的三個時段，教練將會為您確認</p>
       </div>
 
-      <!-- 若已提出審核中顯示 -->
       <div id="pendingProposalBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-800">
         <div class="font-bold mb-1 flex items-center space-x-1">
           <i class="fa-solid fa-hourglass-half"></i>
@@ -136,7 +132,6 @@
       </div>
 
       <div id="proposalForm" class="space-y-3 text-xs">
-        <!-- Rank 1 -->
         <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2">
           <span class="font-extrabold text-emerald-600">第一偏好 (Top 1) *</span>
           <div class="grid grid-cols-2 gap-2">
@@ -144,7 +139,6 @@
             <input type="time" id="pTime1" class="bg-white border border-slate-200 rounded-xl p-2 outline-none">
           </div>
         </div>
-        <!-- Rank 2 -->
         <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2">
           <span class="font-extrabold text-slate-500">第二偏好 (Top 2)</span>
           <div class="grid grid-cols-2 gap-2">
@@ -152,7 +146,6 @@
             <input type="time" id="pTime2" class="bg-white border border-slate-200 rounded-xl p-2 outline-none">
           </div>
         </div>
-        <!-- Rank 3 -->
         <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2">
           <span class="font-extrabold text-slate-500">第三偏好 (Top 3)</span>
           <div class="grid grid-cols-2 gap-2">
@@ -174,7 +167,7 @@
       </div>
     </div>
 
-    <!-- 第四區塊：歷史上課紀錄 -->
+    <!-- 區塊 4：歷史紀錄 -->
     <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-3">
       <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
         <i class="fa-solid fa-clock-rotate-left text-emerald-600"></i>
@@ -187,20 +180,19 @@
 
   </div>
 
-  <!-- 教練資歷彈窗 -->
+  <!-- 教練資歷彈窗 (顯示：綽號 (本名)) -->
   <div id="coachModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-3 border border-slate-100">
       <div class="w-20 h-20 rounded-full bg-slate-200 mx-auto overflow-hidden shadow-md">
-        <img id="modalCoachPhoto" src="https://via.placeholder.com/150" class="w-full h-full object-cover">
+        <img id="modalCoachPhoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="w-full h-full object-cover">
       </div>
       <div>
-        <h3 class="text-lg font-bold text-slate-800" id="modalCoachName">--</h3>
-        <p class="text-xs text-emerald-600 font-semibold" id="modalCoachNickname">--</p>
+        <h3 class="text-lg font-black text-slate-800" id="modalCoachTitle">賽特 (張小明)</h3>
       </div>
-      <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 text-left leading-relaxed max-h-40 overflow-y-auto" id="modalCoachBio">
+      <div class="bg-slate-50 p-3.5 rounded-2xl text-xs text-slate-600 text-left leading-relaxed max-h-40 overflow-y-auto" id="modalCoachBio">
         教練資歷介紹載入中...
       </div>
-      <button onclick="document.getElementById('coachModal').classList.add('hidden')" class="w-full bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs">
+      <button onclick="document.getElementById('coachModal').classList.add('hidden')" class="w-full bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs">
         關閉
       </button>
     </div>
@@ -220,14 +212,49 @@
           const profile = await liff.getProfile();
           currentLineUserId = profile.userId;
         } else {
-          // 測試用開發外掛 ID
           const urlParams = new URLSearchParams(window.location.search);
           currentLineUserId = urlParams.get('lineUserId') || "user_demo_line_id";
         }
         await fetchStudentProfile();
       } catch (e) {
-        console.error("LIFF Init Error:", e);
         document.getElementById('loadingOverlay').classList.add('hidden');
+      }
+    }
+
+    // 正確修復 Google 日曆 1 鍵加入 URL 生成器
+    function generateGoogleCalendarUrl(title, dateStr, timeStr, location, details) {
+      try {
+        if (!dateStr) return "#";
+        const parts = dateStr.split('/');
+        if (parts.length < 3) return "#";
+
+        const y = parts[0];
+        const m = parts[1].padStart(2, '0');
+        const d = parts[2].padStart(2, '0');
+        const dateClean = `${y}${m}${d}`;
+
+        const tParts = (timeStr || '00:00').split(':');
+        const sH = tParts[0].padStart(2, '0');
+        const sM = tParts[1].padStart(2, '0');
+
+        const eH = String(Number(sH) + 1).padStart(2, '0');
+        const eM = sM;
+
+        const startIso = `${dateClean}T${sH}${sM}00`;
+        const endIso = `${dateClean}T${eH}${eM}00`;
+
+        const baseUrl = "https://calendar.google.com/calendar/render";
+        const params = new URLSearchParams({
+          action: "TEMPLATE",
+          text: title,
+          dates: `${startIso}/${endIso}`,
+          location: location || '',
+          details: details || '',
+          ctz: "Asia/Taipei"
+        });
+        return `${baseUrl}?${params.toString()}`;
+      } catch (e) {
+        return "#";
       }
     }
 
@@ -246,7 +273,7 @@
           }
         }
       } catch (e) {
-        alert("資料載入失敗，請重新整理");
+        document.getElementById('loadingOverlay').classList.add('hidden');
       }
     }
 
@@ -255,29 +282,38 @@
       const coach = data.coach;
 
       document.getElementById('headerStudentName').innerText = `嗨！${student.name}`;
-      document.getElementById('headerCoachName').innerText = `🏋️‍♂️ ${coach.name} 教練`;
-      document.getElementById('avatarLetter').innerText = student.name ? student.name[0] : '👤';
+      document.getElementById('headerCoachName').innerText = `🏋️️‍♂️ "${coach.nickname || coach.name}" 教練`;
+      document.getElementById('avatarLetter').innerText = student.name ? student.name.charAt(0) : '👤';
       document.getElementById('maxDaysText').innerText = coach.maxProposalDays || 30;
 
-      // 填寫教練彈窗
-      document.getElementById('modalCoachName').innerText = coach.name || '教練';
-      document.getElementById('modalCoachNickname').innerText = coach.nickname ? `(${coach.nickname})` : '';
-      document.getElementById('modalCoachBio').innerText = coach.bio || '暫無資歷介紹';
+      // 反轉為：綽號 (本名)
+      document.getElementById('modalCoachTitle').innerText = `${coach.nickname || '賽特'} (${coach.name || '張小明'})`;
+      document.getElementById('modalCoachBio').innerText = coach.bio || '專長私人私人教練體適能雕塑與健康管理。';
       if (coach.photoUrl) document.getElementById('modalCoachPhoto').src = coach.photoUrl;
 
-      // Block 1: 最近課程
+      // 區塊 1：最近課程與日曆連結
       if (data.upcoming) {
         document.getElementById('upcomingTime').innerText = `${data.upcoming.date} ${data.upcoming.time}`;
         document.getElementById('upcomingLocation').innerText = data.upcoming.location || '待確認';
         document.getElementById('upcomingBadge').innerText = "近期課程";
-        document.getElementById('calBtn').classList.remove('hidden');
+        
+        const calUrl = generateGoogleCalendarUrl(
+          "🏋️‍♂️ 私人教練健身課",
+          data.upcoming.date,
+          data.upcoming.time,
+          data.upcoming.location,
+          `專屬教練課程\n時間：${data.upcoming.date} ${data.upcoming.time}\n地點：${data.upcoming.location}`
+        );
+        const calBtn = document.getElementById('calBtn');
+        calBtn.href = calUrl;
+        calBtn.classList.remove('hidden');
       } else {
         document.getElementById('upcomingTime').innerText = "尚無預約課程";
         document.getElementById('upcomingLocation').innerText = "--";
         document.getElementById('calBtn').classList.add('hidden');
       }
 
-      // Block 2: 期數與堂數
+      // 區塊 2：期數
       const pkgContainer = document.getElementById('packageList');
       pkgContainer.innerHTML = '';
       if (!data.packages || data.packages.length === 0) {
@@ -296,14 +332,14 @@
               <span class="font-black text-emerald-600 text-sm">${rem} <span class="text-xs font-normal text-slate-400">/ ${total} 堂</span></span>
             </div>
             <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-              <div class="bg-emerald-500 h-2 rounded-full transition-all" style="width: ${pct}%"></div>
+              <div class="bg-emerald-500 h-2 rounded-full" style="width: ${pct}%"></div>
             </div>
           `;
           pkgContainer.appendChild(div);
         });
       }
 
-      // Block 3: 約課意願 Top 3 狀態判定
+      // 區塊 3：Top 3
       if (data.activeProposals && data.activeProposals.length > 0) {
         document.getElementById('proposalForm').classList.add('hidden');
         document.getElementById('pendingProposalBanner').classList.remove('hidden');
@@ -314,7 +350,7 @@
         });
       }
 
-      // Block 4: 歷史紀錄
+      // 區塊 4：歷史紀錄
       const histContainer = document.getElementById('historyList');
       histContainer.innerHTML = '';
       if (!data.history || data.history.length === 0) {
@@ -359,7 +395,6 @@
           fetchStudentProfile();
         }
       } catch (e) {
-        alert("註冊失敗");
         document.getElementById('loadingOverlay').classList.add('hidden');
       }
     }
@@ -369,15 +404,15 @@
       const p1T = document.getElementById('pTime1').value;
       if (!p1D || !p1T) return alert("請至少選擇第一偏好時間 (Top 1)！");
 
-      let proposals = [{ rank: 1, date: p1D.replace(/-/g, '/'), time: p1T, location: document.getElementById('pLocation').value }];
+      let proposals = [{ rank: 1, date: p1D, time: p1T, location: document.getElementById('pLocation').value }];
 
       const p2D = document.getElementById('pDate2').value;
       const p2T = document.getElementById('pTime2').value;
-      if (p2D && p2T) proposals.push({ rank: 2, date: p2D.replace(/-/g, '/'), time: p2T, location: document.getElementById('pLocation').value });
+      if (p2D && p2T) proposals.push({ rank: 2, date: p2D, time: p2T, location: document.getElementById('pLocation').value });
 
       const p3D = document.getElementById('pDate3').value;
       const p3T = document.getElementById('pTime3').value;
-      if (p3D && p3T) proposals.push({ rank: 3, date: p3D.replace(/-/g, '/'), time: p3T, location: document.getElementById('pLocation').value });
+      if (p3D && p3T) proposals.push({ rank: 3, date: p3D, time: p3T, location: document.getElementById('pLocation').value });
 
       const payload = {
         action: 'submitTop3Proposals',
