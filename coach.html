@@ -114,7 +114,7 @@
     </div>
   </div>
 
-  <!-- 新增期數彈窗 (支援「設為體驗課」選項) -->
+  <!-- 新增期數彈窗 -->
   <div id="packageModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100 space-y-4">
       <div class="flex justify-between items-center">
@@ -165,17 +165,23 @@
     function initTimeSelects() {
       const selects = document.querySelectorAll('.time-select');
       selects.forEach(sel => {
-        sel.innerHTML = '<option value="">請選擇時間 (整點/半點)</option>';
+        let html = '<option value="">請選擇時間 (整點/半點)</option>';
         for (let h = 8; h <= 22; h++) {
           const hh = String(h).padStart(2, '0');
-          sel.innerHTML += `<option value="${hh}:00">${hh}:00</option>`;
-          if (h < 22) sel.innerHTML += `<option value="${hh}:30">${hh}:30</option>`;
+          html += `<option value="${hh}:00">${hh}:00</option>`;
+          if (h < 22) html += `<option value="${hh}:30">${hh}:30</option>`;
         }
+        sel.innerHTML = html;
       });
     }
 
-    async function loadData() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTimeSelects);
+    } else {
       initTimeSelects();
+    }
+
+    async function loadData() {
       try {
         const res = await fetch(`${GAS_URL}?action=getCoachDashboard`);
         const data = await res.json();
@@ -230,7 +236,6 @@
       });
     }
 
-    // 渲染學員卡片 (加入【💬 通知學員】一鍵 LINE 通知按鈕)
     function renderStudents(students) {
       const container = document.getElementById('studentContainer');
       container.innerHTML = '';
@@ -282,19 +287,15 @@
       });
     }
 
-    // 一鍵複製與開啟 LINE 訊息通知學員
     function notifyStudent(studentName, date, time, location) {
       const msg = `Allen教練跟你約了一堂教練課\n時間：${date} ${time}\n地點：${location}`;
-      
       if (navigator.clipboard) {
         navigator.clipboard.writeText(msg).then(() => {
           const lineShareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
           if (confirm(`已複製通知文字至剪貼簿！是否開啟 LINE 傳送給 ${studentName}？\n\n【通知內容】\n${msg}`)) {
             window.open(lineShareUrl, '_blank');
           }
-        }).catch(() => {
-          alert(`【通知內容】\n${msg}`);
-        });
+        }).catch(() => { alert(`【通知內容】\n${msg}`); });
       } else {
         alert(`【通知內容】\n${msg}`);
       }
@@ -317,7 +318,7 @@
         pkgBox.innerHTML = '<p class="text-slate-400">無期數紀錄。</p>';
       } else {
         selectedStudent.packages.forEach(p => {
-          const titleName = p.termNumber === 0 ? '體驗課' : `第${p.termNumber}期課`;
+          const titleName = (p.termNumber === 0 || p.termNumber === "0") ? '體驗課' : `第${p.termNumber}期課`;
           pkgBox.innerHTML += `
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex justify-between items-center">
               <div>
@@ -347,7 +348,7 @@
       document.getElementById('schStudentId').value = studentId;
       document.getElementById('schBookingId').value = '';
       document.getElementById('scheduleModalTitle').innerText = `📅 為【${name}】新增預約`;
-      document.getElementById('schDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('schDate').value = new Date().toISOString().split('T');
       document.getElementById('scheduleModal').classList.remove('hidden');
     }
 
@@ -425,7 +426,7 @@
 
     function openPackageModal(studentId) {
       document.getElementById('modalStudentId').value = studentId;
-      document.getElementById('pkgDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pkgDate').value = new Date().toISOString().split('T');
       document.getElementById('pkgIsTrial').checked = false;
       toggleTrialOption();
       document.getElementById('packageModal').classList.remove('hidden');
