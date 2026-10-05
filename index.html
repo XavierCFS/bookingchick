@@ -113,7 +113,7 @@
       </div>
     </div>
 
-    <!-- 區塊 3：預約意願時間 Top 3 (時間限制整點與半點) -->
+    <!-- 區塊 3：預約意願時間 Top 3 (半小時為單位選項) -->
     <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-4">
       <div>
         <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
@@ -208,21 +208,28 @@
     let currentLineUserId = "";
     let currentStudentData = null;
 
-    // 自動生成整點與半點選項 (08:00 ~ 22:00)
+    // 即時填入整點與半點下拉選單 (08:00 ~ 22:00)
     function initTimeSelects() {
       const selects = document.querySelectorAll('.time-select');
       selects.forEach(sel => {
-        sel.innerHTML = '<option value="">請選擇時間 (整點/半點)</option>';
+        let html = '<option value="">請選擇時間 (整點/半點)</option>';
         for (let h = 8; h <= 22; h++) {
           const hh = String(h).padStart(2, '0');
-          sel.innerHTML += `<option value="${hh}:00">${hh}:00</option>`;
-          if (h < 22) sel.innerHTML += `<option value="${hh}:30">${hh}:30</option>`;
+          html += `<option value="${hh}:00">${hh}:00</option>`;
+          if (h < 22) html += `<option value="${hh}:30">${hh}:30</option>`;
         }
+        sel.innerHTML = html;
       });
     }
 
-    async function init() {
+    // 確保 DOM Ready 時第一時間執行選單初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTimeSelects);
+    } else {
       initTimeSelects();
+    }
+
+    async function init() {
       try {
         if (window.liff) await liff.init({ liffId: LIFF_ID });
         if (liff.isLoggedIn()) {
@@ -244,14 +251,14 @@
         const parts = dateStr.split('/');
         if (parts.length < 3) return "#";
 
-        const y = parts[0];
-        const m = parts[1].padStart(2, '0');
-        const d = parts[2].padStart(2, '0');
+        const y = parts;
+        const m = parts.padStart(2, '0');
+        const d = parts.padStart(2, '0');
         const dateClean = `${y}${m}${d}`;
 
         const tParts = (timeStr || '00:00').split(':');
-        const sH = tParts[0].padStart(2, '0');
-        const sM = tParts[1].padStart(2, '0');
+        const sH = tParts.padStart(2, '0');
+        const sM = tParts.padStart(2, '0');
 
         const eH = String(Number(sH) + 1).padStart(2, '0');
         const eM = sM;
@@ -306,14 +313,20 @@
       document.getElementById('modalCoachBio').innerText = coach.bio || '2026-NGP形體組冠軍，專長肌力訓練與體態雕塑。';
       if (coach.photoUrl) document.getElementById('modalCoachPhoto').src = coach.photoUrl;
 
-      // 近期課程與日曆標題 (格式：Allen教練課,第1期,第3堂 或 Allen教練課,體驗課,第1堂)
+      // 行事曆動態標題邏輯判斷：無購買紀錄或為體驗課標題為【Allen教練體驗課】
       if (data.upcoming) {
         document.getElementById('upcomingTime').innerText = `${data.upcoming.date} ${data.upcoming.time}`;
         document.getElementById('upcomingLocation').innerText = data.upcoming.location || '待確認';
         document.getElementById('upcomingBadge').innerText = "近期課程";
         
-        const termStr = data.upcoming.termNumber === 0 ? '體驗課' : `第${data.upcoming.termNumber || 1}期`;
-        const calTitle = `Allen教練課,${termStr},第${data.upcoming.lessonNumber || 1}堂`;
+        const hasFormalPackage = data.packages && data.packages.some(p => p.termNumber > 0);
+        let calTitle = "";
+
+        if (!hasFormalPackage || data.upcoming.termNumber === 0 || data.upcoming.termNumber === "0") {
+          calTitle = "Allen教練體驗課";
+        } else {
+          calTitle = `Allen教練課,第${data.upcoming.termNumber || 1}期,第${data.upcoming.lessonNumber || 1}堂`;
+        }
         
         const calUrl = generateGoogleCalendarUrl(
           calTitle,
@@ -331,7 +344,7 @@
         document.getElementById('calBtn').classList.add('hidden');
       }
 
-      // 購買期數列表 (0期呈現「體驗課」)
+      // 購買期數列表 (第 0 期精準顯示為「體驗課」)
       const pkgContainer = document.getElementById('packageList');
       pkgContainer.innerHTML = '';
       if (!data.packages || data.packages.length === 0) {
@@ -341,7 +354,7 @@
           const total = pkg.totalLessons || 1;
           const rem = pkg.remainingLessons || 0;
           const pct = Math.min(Math.round((rem / total) * 100), 100);
-          const titleName = pkg.termNumber === 0 ? '體驗課' : `第${pkg.termNumber}期課`;
+          const titleName = (pkg.termNumber === 0 || pkg.termNumber === "0") ? '體驗課' : `第${pkg.termNumber}期課`;
 
           const div = document.createElement('div');
           div.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-100 space-y-1.5";
