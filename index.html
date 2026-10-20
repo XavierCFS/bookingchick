@@ -1,469 +1,399 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>學員專屬預約中心</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>動滋</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+:root{--bg:#f6faf3;--tx:#1e2b1e;--sub:#7d8a7d;--ln:#e3ebdf;--gb:#6cc92b;--gd:#4aa21a;--g:#3d9a14;--gl:#eaf6e3;--dk:#2a5b36;--bl:#2a8fc7;--blt:#e3f1fa;--rd:#d94a3d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 -apple-system,BlinkMacSystemFont,'PingFang TC','Noto Sans TC',sans-serif;padding-top:env(safe-area-inset-top)}
+main{max-width:520px;margin:0 auto;padding:14px 18px calc(110px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;cursor:pointer}
+h1{font-size:28px;line-height:1.25;font-weight:800;margin:0}h1.pg{font-size:26px;margin:14px 0 4px}h4{margin:14px 0 6px;font-size:15px}
+p{margin:0}.sub{color:var(--sub);margin-bottom:12px}.sm2{font-size:13px;color:var(--sub)}.g{color:var(--g);font-weight:800}.bl{color:var(--bl)}
+.brand{display:flex;align-items:center;gap:8px;margin:2px 0 14px}.brand b{font-size:17px}.logo{width:28px;height:28px;border-radius:8px;background:var(--gb);color:#fff;display:flex;align-items:center;justify-content:center}
+.tag{margin-left:auto;font-size:12px;color:var(--sub);background:#edf1ea;border-radius:99px;padding:2px 10px}
+.hello{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:6px 0 16px}.hello p{color:var(--sub);font-size:14px;margin-top:4px}
+.avs{width:52px;height:52px;border-radius:16px;background:var(--gl);color:var(--g);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex:none}.avs>span{display:contents}
+.card{background:#fff;border:1px solid var(--ln);border-radius:20px;padding:16px;margin-bottom:12px;display:block;width:100%;text-align:left}
+.stats{display:flex;background:#fff;border:1px solid var(--ln);border-radius:20px;padding:14px 0;margin-bottom:12px}.stats>div{flex:1;text-align:center;display:flex;flex-direction:column}.stats b{font-size:30px;line-height:1.2;font-weight:800}.stats span{font-size:13px;color:var(--sub)}
+.dk{background:var(--dk);color:#fff;border-radius:22px;padding:16px;margin-bottom:14px}.dkh{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15px;opacity:.95}.pill2{font-style:normal;font-size:12px;background:#d8f1df;color:#1f6b36;border-radius:99px;padding:2px 10px;font-weight:700}
+.dkb{display:flex;gap:14px;align-items:center;margin:14px 0}.dbox{width:64px;height:68px;border-radius:14px;background:#1f4a2a;display:flex;flex-direction:column;align-items:center;justify-content:center}.dbox small{font-size:12px;opacity:.85}.dbox b{font-size:30px;line-height:1.1}
+.dsub{opacity:.85;font-size:14px}.dtime{font-size:28px;font-weight:800;line-height:1.2}.dloc{display:flex;gap:4px;align-items:center;font-size:13px;opacity:.9}
+.wbtn{display:flex;gap:8px;align-items:center;justify-content:center;background:#fff;color:#245c32;border-radius:14px;min-height:46px;font-weight:800;text-decoration:none}
+.dfoot{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;color:#fff;border-top:1px solid rgba(255,255,255,.2);margin-top:14px;padding:12px 0 0;font-size:13px;opacity:.9}
+.drow{display:flex;justify-content:space-between;font-size:13px;padding:8px 0 0;opacity:.9}
+.btn{background:var(--gb);color:#1e4a10;border:0;border-bottom:4px solid var(--gd);border-radius:18px;font-weight:800;min-height:54px;width:100%;font-size:17px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-top:6px}
+.btn.big{min-height:58px;margin-top:0}.btn.g{background:#fff;color:var(--g);border:1px solid var(--ln);border-bottom-width:3px}.btn.s{width:auto;min-height:40px;padding:0 14px;font-size:14px;border-radius:12px}
+.btn.r{background:#fff;color:var(--rd);border:1px solid var(--ln)}
+.cap{text-align:center;font-size:12px;color:var(--sub);margin:8px 0 14px}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.ch b{display:block;font-size:17px}.ch small{color:var(--sub);font-size:13px}
+.nds{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.cm{grid-column:1/-1;text-align:center;font-size:12px;color:var(--sub)}
+.nd{aspect-ratio:1;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;background:#eceee8;color:#a3aaa0;border-bottom:3px solid #dcdfd6}
+.nd.d{background:var(--gb);color:#fff;border-bottom-color:var(--gd)}.nd.b{background:var(--blt);color:var(--bl);border:2px solid #bfe0f3;border-bottom-width:3px}
+.lg{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin:12px 0 8px}.lg i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}.dg{background:var(--gb)}.db{background:var(--bl)}.dx{background:#b9bfb5}
+.pt{font-size:13px;font-weight:700;color:var(--g)}
+.crow{display:flex;align-items:center;gap:12px;font:inherit;cursor:pointer}.crow>div:not(.av){flex:1}.crow b{display:block}.crow small,.inf small,.crow2 small{display:block;color:var(--sub);font-size:12px;font-weight:400}
+.av{width:52px;height:52px;border-radius:50%;object-fit:cover;background:var(--gl);color:var(--g);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex:none}.av.sm{width:44px;height:44px}
+.crow2{display:flex;gap:12px;align-items:center}.bio{white-space:pre-line;font-size:14px;margin-top:10px}
+.mn{padding:4px 16px}.mrow{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-top:1px solid var(--ln);padding:14px 0;text-align:left}.mrow:first-child{border-top:0}.mrow b{flex:1}.mrow small{color:var(--sub);font-size:13px}
+.mi{width:36px;height:36px;border-radius:11px;background:var(--gl);color:var(--g);display:flex;align-items:center;justify-content:center;flex:none}
+.steps{display:flex;justify-content:space-between;margin:6px 0 14px;font-size:12px;font-weight:700;color:var(--sub)}.st{display:flex;align-items:center;gap:6px}.st i{width:24px;height:24px;border-radius:50%;background:#eceee8;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px}
+.st.cur{color:var(--tx)}.st.cur i,.st.done i{background:var(--gl);color:var(--g)}.st.done{color:var(--tx)}
+.inf{display:flex;gap:12px;align-items:flex-start}.inf>div{flex:1}.wl{margin-top:6px;font-size:13px}.wl>div{display:flex;gap:10px;padding:2px 0}.wl span{color:var(--sub);width:52px}.ebtn{flex:none;border:1px solid var(--ln);background:#fff;border-radius:12px;min-height:36px;padding:0 14px;font-weight:700;color:var(--g)}.inf b{display:block;font-size:14px}
+.ymrow{display:flex;justify-content:space-between;align-items:center;margin:8px 0}.ymrow b{font-size:17px}.ymrow button,.nav button{width:36px;height:36px;border:0;background:none;color:var(--sub)}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}.dy{border:1px solid var(--ln);background:#fff;border-radius:16px;padding:8px 0;display:flex;flex-direction:column;align-items:center}.dy small{font-size:11px;color:var(--sub)}.dy b{font-size:20px}.dy.on{background:var(--gb);border-color:var(--gb);color:#fff}.dy.on small{color:#fff}.dy:disabled{opacity:.35}
+.sec{display:flex;justify-content:space-between;align-items:center;margin:16px 4px 8px}.sec b{font-size:17px}.cnt{font-style:normal;background:var(--gl);color:var(--g);border-radius:99px;padding:0 9px;font-weight:800;font-size:13px;margin-left:8px;margin-right:auto}
+.ck{display:flex;align-items:center;gap:8px;color:var(--tx);font-size:14px;margin:6px 0 10px}
+.wish{background:#fff;border:1px solid var(--ln);border-radius:20px;padding:14px;margin-bottom:10px}.wish.on{border-color:var(--gb);box-shadow:0 0 0 2px var(--gl)}
+.wh{display:flex;align-items:center;gap:8px;margin-bottom:10px}.wh .x{margin-left:auto;border:0;background:none;color:var(--sub);font-size:18px}.nb{width:22px;height:22px;border-radius:50%;background:var(--gl);color:var(--g);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.wf{display:flex;gap:10px}.df{flex:1;display:flex;align-items:center;gap:8px;background:#f1f5ee;border-radius:14px;padding:0 12px;color:var(--sub)}.df select{border:0;background:none;padding:12px 0;margin:0;color:var(--tx);font-weight:700}
+.tm{width:42%;margin:0!important;background:#f1f5ee!important;border:0!important;border-radius:14px!important;font-size:20px!important;font-weight:800!important;color:var(--g)!important;padding:10px 12px!important}
+.hrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--ln)}.hrow:first-child{border-top:0}.hrow small{margin-left:auto;color:var(--sub)}.hck{width:26px;height:26px;border-radius:9px;background:var(--gb);color:#fff;display:flex;align-items:center;justify-content:center}
+.row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--ln);font-size:14px}.row:first-child{border-top:0}.row>span:first-child{color:var(--sub)}.empty{color:var(--sub);padding:8px 0}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:11px 14px;border:1px solid var(--ln);border-radius:14px;background:#f8fbf6;color:var(--tx);margin:4px 0 12px}
+input[type=checkbox]{width:18px;height:18px;padding:0;margin:0;accent-color:var(--gb);flex:none}label{font-size:12px;color:var(--sub)}.ck{font-size:14px}
+.dt{display:flex;gap:10px;align-items:center}.dt select{flex:1}
+.lk{background:none;border:0;color:var(--g);font-weight:800;font-size:14px;min-height:40px}.lk.r{color:var(--rd)}
+.seg{display:flex;background:#eaeee6;border-radius:16px;padding:4px;margin-bottom:12px}.seg button{flex:1;border:0;background:none;border-radius:12px;padding:9px 0;font-weight:700;color:var(--sub)}.seg button.on{background:#fff;color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.cal{margin-bottom:6px}.nav{display:flex;justify-content:space-between;align-items:center}.nav button{width:40px}.ndt{text-align:center}.ndt b{display:block;font-size:17px}.ndt small{color:var(--sub);font-size:12px}
+.sum{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--sub);margin:10px 0}.tdy{border:0;background:var(--gl);color:var(--g);border-radius:99px;padding:3px 12px;font-weight:800;font-size:12px}
+.tl{display:flex;gap:12px;margin-bottom:12px}.tt{width:48px;flex:none}.tt b{display:block;font-size:17px}.tt small{color:var(--sub);font-size:12px}
+.tcd{flex:1;background:#fff;border:1px solid var(--ln);border-radius:18px;padding:14px}.tcd.dn{background:#f1f3ef}.tr{display:flex;justify-content:space-between;align-items:center}.tr b{font-size:17px}
+.chipx{font-style:normal;font-size:11px;font-weight:700;border-radius:99px;padding:2px 10px}.chipx.gr{background:var(--gl);color:var(--g)}.chipx.gy{background:#e6e9e3;color:var(--sub)}.chipx.w{background:#fff2d6;color:#a8700a}
+.ta{display:flex;gap:8px;align-items:center;margin-top:10px}.ta button{border-radius:12px;min-height:38px;padding:0 14px;font-weight:700;border:1px solid var(--ln);background:#fff;display:inline-flex;align-items:center;gap:4px}.ta .ok{border-color:var(--gb);color:var(--g)}.ta .cx{margin-left:auto;border:0;color:var(--rd)}
+.nowl{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:12px;font-weight:700;color:var(--g)}.nowl i{flex:1;height:1px;background:var(--gb)}.nowl b{width:48px}
+.rqh{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}.rqh b{font-size:17px}
+.opts{display:flex;gap:8px;margin:12px 0}.op{flex:1;border:1px solid var(--ln);background:#fff;border-radius:14px;padding:8px 0;display:flex;flex-direction:column;align-items:center}.op small{font-size:11px;color:var(--sub)}.op b{font-size:20px}.op.on{border:2px solid var(--gb);background:var(--gl);color:var(--g)}
+.locl{display:flex;align-items:center;gap:6px;color:var(--sub)}.locl input{margin:0;border:0;background:none;padding:6px 0;font-size:14px}.rqb{display:flex;align-items:center;gap:8px}.rqb .btn{margin-top:0;flex:1;width:auto}.rqb .lk{flex:none;white-space:nowrap}
+.wk,.mo{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:6px 0 12px}
+.wc{border:1px solid var(--ln);background:#fff;border-radius:12px;min-height:170px;padding:3px;display:flex;flex-direction:column;gap:4px;cursor:pointer;font-size:12px;text-align:center}.wc.td,.mc.td{border:2px solid var(--gb);background:var(--gl)}
+.chip{border-radius:7px;font-size:10px;line-height:1.25;padding:2px 0}.chip.d{background:#e6e9e3;color:var(--sub)}.chip.b{background:var(--gb);color:#1e4a10}
+.mc{height:52px;border:1px solid var(--ln);background:#fff;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px;font-size:12px;cursor:pointer}.mc.x{opacity:.4}
+.stp{display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff}.stp.d{background:#b9bfb5}.stp.b{background:var(--gb);color:#1e4a10}
+details.blk{background:#fff;border:1px solid var(--ln);border-radius:20px;padding:0 16px;margin-bottom:12px}details.blk details.blk{background:#f8fbf6;border-radius:14px;margin:8px 0 0;padding:0 12px}
+summary{min-height:52px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px;cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}summary span{flex:1}summary small{font-weight:400;color:var(--sub);font-size:13px}.bd{padding:0 0 14px}details[open]>summary .ic{transform:rotate(90deg)}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;background:#fff;border-top:1px solid var(--ln);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.tabs button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700;color:var(--sub)}.tabs button span{width:52px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;position:relative}
+.tabs button.on{color:var(--g)}.tabs button.on span{background:var(--gl)}.dotr{position:absolute;top:2px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--rd)}
+a{color:var(--g)}input[type=date],input[type=datetime-local]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;min-height:48px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.chp{border:1px solid var(--ln);background:#fff;border-radius:99px;padding:6px 14px;font-weight:700}.chp.on{background:var(--gl);border-color:var(--gb);color:var(--g)}
+.pdef{font-style:normal;margin-left:8px;font-size:11px;background:var(--gl);color:var(--g);border-radius:99px;padding:1px 8px;font-weight:700}.acts2{display:flex;gap:4px;align-items:center}
+.back{display:flex;align-items:center;gap:2px;background:none;border:0;color:var(--g);font-weight:800;padding:4px 0;margin-bottom:2px}
+.phs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.ph{position:relative;width:88px;height:88px}.ph img{width:100%;height:100%;object-fit:cover;border-radius:12px}.ph button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#333;color:#fff}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.pgrid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}
+.nrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--ln)}.nrow:first-child{border-top:0}.nrow span{flex:1;font-size:14px;white-space:pre-line}.nrow small{color:var(--sub)}
+button.hrow{width:100%;background:none;border:0;border-top:1px solid var(--ln);text-align:left}button.hrow:first-child{border-top:0}.hrow b{font-weight:700}.hrow .ic{color:var(--sub);flex:none}
+.dy em{font-style:normal;font-size:10px;color:var(--rd)}.locl select{margin:0;border:0;background:none;padding:6px 0;font-size:14px;flex:1;color:var(--tx)}
+.tm{width:48%!important}
+.dt2{display:grid;grid-template-columns:1fr 24px 1fr;gap:8px;align-items:center;margin-bottom:12px}.dt2 select{margin:0;min-height:48px}.dt2 span{text-align:center;color:var(--sub)}
+.ck2{display:inline-flex;align-items:center;gap:4px;font-size:15px;color:var(--tx)}.stepr{margin:2px 0 14px;font-size:15px}.shs{font-size:13px;color:var(--sub);margin:4px 0 6px;font-weight:700}.sh{font-size:17px;font-weight:800;margin:6px 0 8px}
+.mk{display:flex;gap:3px;justify-content:center;align-items:center;min-height:16px;margin-top:2px}.ct{font-style:normal;font-size:10px;font-weight:800;background:var(--gl);color:var(--g);border-radius:99px;padding:0 6px}.dy.on .ct{background:#fff}.dy.on em{color:#fff}
+footer{margin:24px 0;text-align:center;font-size:13px;color:var(--sub)}
+</style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 pb-12">
-
-  <!-- 載入中遮罩 -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-white/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-    <div class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-    <p class="text-sm font-semibold text-slate-600">正在讀取專屬資料...</p>
-  </div>
-
-  <!-- 首次註冊引導彈窗 -->
-  <div id="registerModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-md z-40 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border border-slate-100">
-      <div class="text-center mb-5">
-        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl mb-2">
-          <i class="fa-solid fa-user-plus"></i>
-        </div>
-        <h2 class="text-xl font-bold text-slate-900">建立個人學員資料</h2>
-        <p class="text-xs text-slate-500 mt-1">歡迎第一次使用 LINE 預約系統，請填寫基本資料</p>
-      </div>
-      <div class="space-y-3 text-xs font-medium">
-        <div>
-          <label class="block text-slate-600 mb-1">姓名 *</label>
-          <input type="text" id="regName" placeholder="請輸入姓名" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500">
-        </div>
-        <div>
-          <label class="block text-slate-600 mb-1">手機號碼 (將自動作為帳號ID) *</label>
-          <input type="tel" id="regPhone" placeholder="0983123456" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-emerald-500">
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-600 mb-1">生理性別 *</label>
-            <select id="regSex" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
-              <option value="男">男</option>
-              <option value="女">女</option>
-              <option value="不透漏">不透漏</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-slate-600 mb-1">生日 *</label>
-            <input type="date" id="regBirthday" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
-          </div>
-        </div>
-        <div class="flex items-center justify-between bg-emerald-50 p-3 rounded-xl border border-emerald-100 mt-2">
-          <div class="flex items-center space-x-2">
-            <i class="fa-regular fa-calendar-check text-emerald-600 text-base"></i>
-            <span class="text-slate-700">連動 Google 行事曆</span>
-          </div>
-          <input type="checkbox" id="regCalSync" checked class="w-5 h-5 accent-emerald-600">
-        </div>
-      </div>
-      <button onclick="submitRegistration()" class="mt-5 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition">
-        完成註冊並進入專屬頁面
-      </button>
-    </div>
-  </div>
-
-  <!-- 學員主頁面 -->
-  <div class="max-w-md mx-auto p-4 space-y-4">
-    
-    <!-- 頁首標題區 -->
-    <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 flex justify-between items-center">
-      <div>
-        <div onclick="openStudentProfileModal()" class="cursor-pointer group flex items-center space-x-2">
-          <h1 class="text-xl font-black text-slate-800 group-hover:text-emerald-600 transition" id="headerStudentName">嗨！載入中...</h1>
-          <i class="fa-solid fa-pen-to-square text-xs text-slate-400 group-hover:text-emerald-600"></i>
-        </div>
-        <div onclick="openCoachInfoModal()" class="cursor-pointer group flex items-center space-x-1 mt-1">
-          <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100" id="headerCoachName">Allen教練</span>
-          <i class="fa-solid fa-circle-info text-xs text-emerald-500"></i>
-        </div>
-      </div>
-      <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-inner" id="avatarLetter">
-        👤
-      </div>
-    </div>
-
-    <!-- 區塊 1：最近一期上課提醒 -->
-    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-5 text-white shadow-xl relative overflow-hidden">
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-xs bg-white/20 backdrop-blur-md text-white font-bold px-3 py-1 rounded-full" id="upcomingBadge">近期課程</span>
-        <a id="calBtn" href="#" target="_blank" class="hidden text-xs bg-white text-emerald-800 font-extrabold px-3 py-1.5 rounded-xl shadow hover:bg-emerald-50 transition flex items-center space-x-1">
-          <i class="fa-solid fa-calendar-plus"></i>
-          <span>📅 加到 Google 日曆</span>
-        </a>
-      </div>
-      <div class="text-2xl font-black mb-1" id="upcomingTime">尚無預約課程</div>
-      <div class="text-xs text-emerald-100 flex items-center space-x-1">
-        <i class="fa-solid fa-location-dot"></i>
-        <span>地點：<span id="upcomingLocation" class="font-bold underline">--</span></span>
-      </div>
-    </div>
-
-    <!-- 區塊 2：購買期數與堂數進度 -->
-    <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-3">
-      <div class="flex justify-between items-center">
-        <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
-          <i class="fa-solid fa-ticket text-emerald-600"></i>
-          <span>購買期數與堂數進度</span>
-        </h2>
-        <span class="text-[10px] bg-slate-100 text-slate-500 font-medium px-2 py-0.5 rounded-full">FIFO 優先扣早期堂數</span>
-      </div>
-      <div id="packageList" class="space-y-3">
-        <div class="text-center py-4 text-slate-400 text-xs">載入期數資料中...</div>
-      </div>
-    </div>
-
-    <!-- 區塊 3：預約意願時間 Top 3 -->
-    <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-4">
-      <div>
-        <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
-          <i class="fa-solid fa-calendar-days text-emerald-600"></i>
-          <span>預約意願時間 (Top 3)</span>
-        </h2>
-        <p class="text-xs text-slate-400 mt-0.5">選擇未來 <span id="maxDaysText">30</span> 天內方便的三個時段 (整點或半點)</p>
-      </div>
-
-      <div id="pendingProposalBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-800">
-        <div class="font-bold mb-1 flex items-center space-x-1">
-          <i class="fa-solid fa-hourglass-half"></i>
-          <span>已送出約課意願，等候教練確認中：</span>
-        </div>
-        <ul id="pendingProposalList" class="space-y-1 pl-4 list-disc text-slate-600"></ul>
-      </div>
-
-      <div id="proposalForm" class="space-y-3 text-xs">
-        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2">
-          <span class="font-extrabold text-emerald-600">第一偏好 (Top 1) *</span>
-          <div class="grid grid-cols-2 gap-2">
-            <input type="date" id="pDate1" class="bg-white border border-slate-200 rounded-xl p-2 outline-none">
-            <select id="pTime1" class="time-select bg-white border border-slate-200 rounded-xl p-2 outline-none"></select>
-          </div>
-        </div>
-        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2">
-          <span class="font-extrabold text-slate-500">第二偏好 (Top 2)</span>
-          <div class="grid grid-cols-2 gap-2">
-            <input type="date" id="pDate2" class="bg-white border border-slate-200 rounded-xl p-2 outline-none">
-            <select id="pTime2" class="time-select bg-white border border-slate-200 rounded-xl p-2 outline-none"></select>
-          </div>
-        </div>
-        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-2">
-          <span class="font-extrabold text-slate-500">第三偏好 (Top 3)</span>
-          <div class="grid grid-cols-2 gap-2">
-            <input type="date" id="pDate3" class="bg-white border border-slate-200 rounded-xl p-2 outline-none">
-            <select id="pTime3" class="time-select bg-white border border-slate-200 rounded-xl p-2 outline-none"></select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-slate-500 mb-1">上課地點偏好</label>
-          <select id="pLocation" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none font-medium text-slate-700">
-            <option value="賽特體適能中華總店">📍 賽特體適能中華總店</option>
-            <option value="賽特體適能同盟店">📍 賽特體適能同盟店</option>
-            <option value="待教練確認">❓ 待教練確認</option>
-          </select>
-        </div>
-        <button onclick="submitProposals()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow-md transition">
-          送出 Top 3 約課意願給教練
-        </button>
-      </div>
-    </div>
-
-    <!-- 區塊 4：歷史紀錄 -->
-    <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/60 space-y-3">
-      <h2 class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
-        <i class="fa-solid fa-clock-rotate-left text-emerald-600"></i>
-        <span>歷史上課紀錄</span>
-      </h2>
-      <div id="historyList" class="space-y-2 max-h-56 overflow-y-auto">
-        <div class="text-center py-4 text-slate-400 text-xs">載入歷史紀錄中...</div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- 教練資歷彈窗 -->
-  <div id="coachModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center space-y-3 border border-slate-100">
-      <div class="w-20 h-20 rounded-full bg-slate-200 mx-auto overflow-hidden shadow-md">
-        <img id="modalCoachPhoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="w-full h-full object-cover">
-      </div>
-      <div>
-        <h3 class="text-lg font-black text-slate-800" id="modalCoachTitle">Allen (劉立愷)</h3>
-      </div>
-      <div class="bg-slate-50 p-3.5 rounded-2xl text-xs text-slate-600 text-left leading-relaxed max-h-40 overflow-y-auto" id="modalCoachBio">
-        教練資歷介紹載入中...
-      </div>
-      <button onclick="document.getElementById('coachModal').classList.add('hidden')" class="w-full bg-slate-100 text-slate-700 font-bold py-2.5 rounded-xl text-xs">
-        關閉
-      </button>
-    </div>
-  </div>
-
-  <script>
-    const LIFF_ID = "2011814195-BxeoylZA"; 
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby5pg9LCeT9VC-5qs7lKnoRC6MdJuC6KiRjUjNI53NmFtxCynjbZqK8IWo_nviQDjBF/exec";
-    
-    let currentLineUserId = "";
-    let currentStudentData = null;
-
-    function initTimeSelects() {
-      const selects = document.querySelectorAll('.time-select');
-      selects.forEach(sel => {
-        let html = '<option value="">請選擇時間 (整點/半點)</option>';
-        for (let h = 8; h <= 22; h++) {
-          const hh = String(h).padStart(2, '0');
-          html += `<option value="${hh}:00">${hh}:00</option>`;
-          if (h < 22) html += `<option value="${hh}:30">${hh}:30</option>`;
-        }
-        sel.innerHTML = html;
-      });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initTimeSelects);
-    } else {
-      initTimeSelects();
-    }
-
-    async function init() {
-      try {
-        if (window.liff) await liff.init({ liffId: LIFF_ID });
-        if (liff.isLoggedIn()) {
-          const profile = await liff.getProfile();
-          currentLineUserId = profile.userId;
-        } else {
-          const urlParams = new URLSearchParams(window.location.search);
-          currentLineUserId = urlParams.get('lineUserId') || "user_demo_line_id";
-        }
-        await fetchStudentProfile();
-      } catch (e) {
-        document.getElementById('loadingOverlay').classList.add('hidden');
-      }
-    }
-
-    function generateGoogleCalendarUrl(title, dateStr, timeStr, location, details) {
-      try {
-        if (!dateStr) return "#";
-        const parts = dateStr.split('/');
-        if (parts.length < 3) return "#";
-
-        const y = parts[0];
-        const m = parts[1].padStart(2, '0');
-        const d = parts[2].padStart(2, '0');
-        const dateClean = `${y}${m}${d}`;
-
-        const tParts = (timeStr || '00:00').split(':');
-        const sH = tParts[0].padStart(2, '0');
-        const sM = tParts[1].padStart(2, '0');
-
-        const eH = String(Number(sH) + 1).padStart(2, '0');
-        const eM = sM;
-
-        const startIso = `${dateClean}T${sH}${sM}00`;
-        const endIso = `${dateClean}T${eH}${eM}00`;
-
-        const baseUrl = "https://calendar.google.com/calendar/render";
-        const params = new URLSearchParams({
-          action: "TEMPLATE",
-          text: title,
-          dates: `${startIso}/${endIso}`,
-          location: location || '',
-          details: details || '',
-          ctz: "Asia/Taipei"
-        });
-        return `${baseUrl}?${params.toString()}`;
-      } catch (e) {
-        return "#";
-      }
-    }
-
-    async function fetchStudentProfile() {
-      try {
-        const res = await fetch(`${GAS_URL}?action=getStudentProfile&lineUserId=${encodeURIComponent(currentLineUserId)}`);
-        const data = await res.json();
-        document.getElementById('loadingOverlay').classList.add('hidden');
-
-        if (data && data.success) {
-          if (!data.isRegistered) {
-            document.getElementById('registerModal').classList.remove('hidden');
-          } else {
-            currentStudentData = data;
-            renderStudentView(data);
-          }
-        }
-      } catch (e) {
-        document.getElementById('loadingOverlay').classList.add('hidden');
-      }
-    }
-
-    function renderStudentView(data) {
-      const student = data.student;
-      const coach = data.coach;
-
-      document.getElementById('headerStudentName').innerText = `嗨！${student.name}`;
-      document.getElementById('headerCoachName').innerText = `Allen教練`;
-      document.getElementById('avatarLetter').innerText = student.name ? student.name.charAt(0) : '👤';
-      document.getElementById('maxDaysText').innerText = coach.maxProposalDays || 30;
-
-      document.getElementById('modalCoachTitle').innerText = `${coach.nickname || 'Allen'} (${coach.name || '劉立愷'})`;
-      document.getElementById('modalCoachBio').innerText = coach.bio || '2026-NGP形體組冠軍，專長肌力訓練與體態雕塑。';
-      if (coach.photoUrl) document.getElementById('modalCoachPhoto').src = coach.photoUrl;
-
-      if (data.upcoming) {
-        document.getElementById('upcomingTime').innerText = `${data.upcoming.date} ${data.upcoming.time}`;
-        document.getElementById('upcomingLocation').innerText = data.upcoming.location || '待確認';
-        document.getElementById('upcomingBadge').innerText = "近期課程";
-        
-        const hasFormalPackage = data.packages && data.packages.some(p => p.termNumber > 0);
-        let calTitle = "";
-
-        if (!hasFormalPackage || data.upcoming.termNumber === 0 || data.upcoming.termNumber === "0") {
-          calTitle = "Allen教練體驗課";
-        } else {
-          calTitle = `Allen教練課,第${data.upcoming.termNumber || 1}期,第${data.upcoming.lessonNumber || 1}堂`;
-        }
-        
-        const calUrl = generateGoogleCalendarUrl(
-          calTitle,
-          data.upcoming.date,
-          data.upcoming.time,
-          data.upcoming.location,
-          `Allen教練私人課程\n時間：${data.upcoming.date} ${data.upcoming.time}\n地點：${data.upcoming.location}`
-        );
-        const calBtn = document.getElementById('calBtn');
-        calBtn.href = calUrl;
-        calBtn.classList.remove('hidden');
-      } else {
-        document.getElementById('upcomingTime').innerText = "尚無預約課程";
-        document.getElementById('upcomingLocation').innerText = "--";
-        document.getElementById('calBtn').classList.add('hidden');
-      }
-
-      const pkgContainer = document.getElementById('packageList');
-      pkgContainer.innerHTML = '';
-      if (!data.packages || data.packages.length === 0) {
-        pkgContainer.innerHTML = '<p class="text-xs text-slate-400 py-2">目前無生效中課程期數。</p>';
-      } else {
-        data.packages.forEach(pkg => {
-          const total = pkg.totalLessons || 1;
-          const rem = pkg.remainingLessons || 0;
-          const pct = Math.min(Math.round((rem / total) * 100), 100);
-          const titleName = (pkg.termNumber === 0 || pkg.termNumber === "0") ? '體驗課' : `第${pkg.termNumber}期課`;
-
-          const div = document.createElement('div');
-          div.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-100 space-y-1.5";
-          div.innerHTML = `
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-slate-700">${titleName}</span>
-              <span class="font-black text-emerald-600 text-sm">${rem} <span class="text-xs font-normal text-slate-400">/ ${total} 堂</span></span>
-            </div>
-            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-              <div class="bg-emerald-500 h-2 rounded-full" style="width: ${pct}%"></div>
-            </div>
-          `;
-          pkgContainer.appendChild(div);
-        });
-      }
-
-      if (data.activeProposals && data.activeProposals.length > 0) {
-        document.getElementById('proposalForm').classList.add('hidden');
-        document.getElementById('pendingProposalBanner').classList.remove('hidden');
-        const pList = document.getElementById('pendingProposalList');
-        pList.innerHTML = '';
-        data.activeProposals.forEach(p => {
-          pList.innerHTML += `<li>Top ${p.rank}: ${p.date} ${p.time} (${p.location})</li>`;
-        });
-      }
-
-      const histContainer = document.getElementById('historyList');
-      histContainer.innerHTML = '';
-      if (!data.history || data.history.length === 0) {
-        histContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">尚無歷史上課紀錄。</p>';
-      } else {
-        data.history.forEach(h => {
-          histContainer.innerHTML += `
-            <div class="flex justify-between items-center text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-              <div>
-                <span class="font-bold text-slate-800">${h.date} ${h.time}</span>
-                <span class="text-slate-400 ml-1">📍 ${h.location}</span>
-              </div>
-              <span class="text-emerald-600 font-semibold">已核銷</span>
-            </div>
-          `;
-        });
-      }
-    }
-
-    async function submitRegistration() {
-      const name = document.getElementById('regName').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      if (!name || !phone) return alert("請填寫姓名與手機號碼！");
-
-      const payload = {
-        action: 'registerStudent',
-        lineUserId: currentLineUserId,
-        name: name,
-        phone: phone,
-        sex: document.getElementById('regSex').value,
-        birthday: document.getElementById('regBirthday').value,
-        googleCalSync: document.getElementById('regCalSync').checked
-      };
-
-      document.getElementById('loadingOverlay').classList.remove('hidden');
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-        const result = await res.json();
-        if (result && result.success) {
-          alert("🎉 註冊成功！");
-          document.getElementById('registerModal').classList.add('hidden');
-          fetchStudentProfile();
-        }
-      } catch (e) {
-        document.getElementById('loadingOverlay').classList.add('hidden');
-      }
-    }
-
-    async function submitProposals() {
-      const p1D = document.getElementById('pDate1').value;
-      const p1T = document.getElementById('pTime1').value;
-      if (!p1D || !p1T) return alert("請至少選擇第一偏好時間 (Top 1)！");
-
-      let proposals = [{ rank: 1, date: p1D, time: p1T, location: document.getElementById('pLocation').value }];
-
-      const p2D = document.getElementById('pDate2').value;
-      const p2T = document.getElementById('pTime2').value;
-      if (p2D && p2T) proposals.push({ rank: 2, date: p2D, time: p2T, location: document.getElementById('pLocation').value });
-
-      const p3D = document.getElementById('pDate3').value;
-      const p3T = document.getElementById('pTime3').value;
-      if (p3D && p3T) proposals.push({ rank: 3, date: p3D, time: p3T, location: document.getElementById('pLocation').value });
-
-      const payload = {
-        action: 'submitTop3Proposals',
-        studentId: currentStudentData.student.studentId,
-        proposals: proposals
-      };
-
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-        const result = await res.json();
-        if (result && result.success) {
-          alert("🎉 " + result.message);
-          fetchStudentProfile();
-        }
-      } catch (e) {
-        alert("送出失敗");
-      }
-    }
-
-    function openStudentProfileModal() {
-      alert(`【學員基本資料】\n姓名：${currentStudentData.student.name}\n帳號ID：${currentStudentData.student.studentId}\n電話：${currentStudentData.student.phone}\nGoogle日曆連動：${currentStudentData.student.googleCalSync ? '開啟' : '關閉'}`);
-    }
-
-    function openCoachInfoModal() {
-      document.getElementById('coachModal').classList.remove('hidden');
-    }
-
-    init();
-  </script>
+<body>
+<main id="app"><p class="sm2" style="padding:40px 0;text-align:center">載入中…</p></main>
+<script>
+function __show(m){var a=document.getElementById("app");if(a)a.innerHTML='<h1>發生錯誤</h1><p class="sm2" style="word-break:break-all">'+String(m).replace(/</g,"&lt;")+'</p>';}
+window.addEventListener("error",e=>__show((e.message||"error")+" (line "+(e.lineno||"?")+")"));
+window.addEventListener("unhandledrejection",e=>__show((e.reason&&e.reason.message)||e.reason));
+</script>
+<script>
+const CONFIG={LIFF_ID:"2011857437-xFUbKdAg"};
+/* 資料層：目前存在本機瀏覽器；上線請把 load/save 換成 Supabase / Firebase */
+const blank=()=>({coach:null,students:{},packages:[],lessons:[],requests:[],notes:[],cfg:{maxDays:30,place:""}});
+const store={load(){try{return JSON.parse(localStorage.getItem("cb_db"))||blank()}catch(e){return blank()}},save(d){localStorage.setItem("cb_db",JSON.stringify(d))}};
+let db=store.load(),S={uid:null,coachMode:false,demo:!CONFIG.LIFF_ID,cv:"d",cd:new Date(),more:false,tmp:null,exp:{},hist:false,tab:"",pk:{},bk:null},FIRST=true;
+const WD="日一二三四五六",p2=n=>String(n).padStart(2,"0");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";");
+const rid=()=>Math.random().toString(36).slice(2,10);
+const hm=d=>{d=new Date(d);return p2(d.getHours())+":"+p2(d.getMinutes())};
+const md=d=>{d=new Date(d);return `${d.getMonth()+1}/${d.getDate()} 週${WD[d.getDay()]}`};
+const fmt=d=>md(d)+" "+hm(d);
+const sameD=(a,b)=>new Date(a).toDateString()==new Date(b).toDateString();
+const loc=d=>{const o=new Date(d-d.getTimezoneOffset()*6e4);return o.toISOString().slice(0,16)};
+const gcal=l=>{const z=x=>new Date(x).toISOString().replace(/[-:]|\.\d{3}/g,"");const e=new Date(+new Date(l.start)+(l.len||LEN)*6e4);
+return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("教練課")}&dates=${z(l.start)}/${z(e)}&location=${encodeURIComponent(l.place||"")}`};
+const commit=()=>{store.save(db);render()};
+const TH=()=>{const u=S.coachMode?db.coach:db.students[S.uid];return(u&&u.theme)||S.tmp||"r"};
+/* 扣課：已完成的課從最早的期數開始；已預約的課接在後面 */
+function stats(sid){let done=db.lessons.filter(l=>l.sid===sid&&l.status==="done").sort((a,b)=>a.start.localeCompare(b.start)),sc=db.lessons.filter(l=>l.sid===sid&&l.status==="scheduled").length;
+return db.packages.filter(p=>p.sid===sid).map(p=>{const used=done.slice(0,p.total);done=done.slice(p.total);const book=Math.min(p.total-used.length,sc);sc-=book;return{...p,used,book,remain:p.total-used.length}})}
+const remainOf=sid=>stats(sid).reduce((n,p)=>n+p.remain,0);
+/* ===== 預約規則：開放時段、固定不可約、休假日 ===== */
+let LEN=+((db.cfg&&db.cfg.len)||60);const syncLen=()=>{LEN=+db.cfg.len||60},cfg=()=>Object.assign({open:"08:00",close:"22:00",blocks:[],offWd:[],offDates:[],len:60,step:30,places:[],defPlace:""},db.cfg);
+(()=>{const c=db.cfg=db.cfg||{};if(!c.places){c.places=c.place?[{id:rid(),name:c.place}]:[];c.defPlace=c.places[0]?c.places[0].id:""}syncLen()})();
+const PL=()=>cfg().places,defPlace=()=>{const p=PL(),d=p.find(x=>x.id===cfg().defPlace)||p[0];return d?d.name:(db.cfg.place||"")};
+const stuPlace=sid=>{const u=db.students[sid],p=u&&u.place&&PL().find(x=>x.id===u.place);return p?p.name:defPlace()};
+const placeSel=(n,cur)=>{const p=PL();if(!p.length)return `<input name="${n}" value="${esc(cur||"")}" placeholder="上課地點">`;const a=p.map(x=>x.name);if(cur&&!a.includes(cur))a.unshift(cur);return `<select name="${n}">${a.map(x=>`<option${x===cur?" selected":""}>${esc(x)}</option>`).join("")}</select>`};
+const tm=s=>{const[a,b]=s.split(":");return +a*60+ +b},fm=m=>p2(Math.floor(m/60))+":"+p2(m%60);
+const ymd=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+function slots(ds){const c=cfg(),d=new Date(ds+"T00:00"),w=d.getDay();if(c.offDates.includes(ds)||c.offWd.includes(w))return[];
+const busy=db.lessons.filter(l=>l.status==="scheduled"&&sameD(l.start,d)).map(l=>{const x=new Date(l.start);return[x.getHours()*60+x.getMinutes(),l.len||LEN]}),n=new Date(),nowM=sameD(d,n)?n.getHours()*60+n.getMinutes():-1,o=[];
+for(let m=tm(c.open);m<=tm(c.close)-LEN;m+=(+c.step||30)){if(m<=nowM)continue;
+if(c.blocks.some(b=>(b.wd==="*"||+b.wd===w)&&m<tm(b.to)&&m+LEN>tm(b.from)))continue;
+if(busy.some(([x,y])=>m<x+y&&m+LEN>x))continue;o.push(fm(m))}return o}
+const okSlot=iso=>{const x=new Date(iso);return slots(ymd(x)).includes(hm(x))};
+const tsel=(n,v,a=360,z=1410,ph=0)=>{let o=ph?'<option value="">時間</option>':"";for(let m=a;m<=z;m+=30)o+=`<option ${fm(m)===v?"selected":""}>${fm(m)}</option>`;return `<select name="${n}">${o}</select>`};
+function rule(){const c=cfg(),t=ymd(new Date()),od=c.offDates.filter(x=>x>=t).slice(0,5);return `<li>每天 ${c.open}–${c.close} 可預約，每 30 分鐘一個時段</li><li>每堂 ${LEN} 分鐘</li>`+(c.offWd.length?`<li>固定休假：${[1,2,3,4,5,6,0].filter(w=>c.offWd.includes(w)).map(w=>"週"+WD[w]).join("、")}</li>`:"")+(od.length?`<li>指定休假日：${od.map(x=>x.slice(5).replace("-","/")).join("、")}</li>`:"")}
+function picker(){const D=[];for(let i=0;i<=(db.cfg.maxDays||30);i++){const d=new Date();d.setDate(d.getDate()+i);if(slots(ymd(d)).length)D.push([ymd(d),md(d)])}
+if(!D.length)return `<div class="empty">目前沒有可預約的日期，請聯絡教練。</div>`;
+return `<label style="color:var(--tx);font-size:14px"><input type="checkbox" name="same">預約同天（3 個志願用同一天，只需選時間）</label>`+[1,2,3].map(i=>`<label>志願 ${i}</label><div class="dt"><select name="d${i}"><option value="">日期</option>${D.map(([v,n])=>`<option value="${v}">${n}</option>`).join("")}</select><select name="h${i}"><option value="">時間</option></select></div>`).join("")}
+function cfgB(){const c=cfg(),O=[1,2,3,4,5,6,0];
+return `<div class="card"><div data-f><h4 style="margin-top:0">開放預約時段</h4><div class="dt2">${tsel("open",c.open,0,1440)}<span>–</span>${tsel("close",c.close,0,1440)}</div><div class="stepr">每 <label class="ck2"><input type="checkbox" name="stp30" ${c.step!==60?"checked":""}>30</label> / <label class="ck2"><input type="checkbox" name="stp60" ${c.step===60?"checked":""}>60</label> 分鐘一個時段</div><div class="shs">學員可預約的天數上限</div><div class="dt2"><select name="maxDays">${[...new Set([7,14,30,45,60,90,+(db.cfg.maxDays||30)])].sort((a,b)=>a-b).map(v=>`<option value="${v}"${v===+(db.cfg.maxDays||30)?" selected":""}>${v}</option>`).join("")}</select><span>天</span><span></span></div><h4>每週固定休假日</h4><div style="display:flex;flex-wrap:wrap;gap:6px 14px">${O.map(w=>`<label style="font-size:14px;color:var(--tx)"><input type="checkbox" name="wd${w}" ${c.offWd.includes(w)?"checked":""}>週${WD[w]}</label>`).join("")}</div><br><button class="btn" data-act="saveCfg">儲存</button></div></div>`+
+`<div class="card"><h4 style="margin-top:0">固定不可約時段</h4>`+(c.blocks.map(b=>`<div class="row"><span>${b.wd==="*"?"每天":"週"+WD[b.wd]}　${b.from}–${b.to}</span><button class="lk" data-act="delBlock" data-bid="${b.id}">刪除</button></div>`).join("")||`<div class="empty">尚未設定</div>`)+
+`<div data-f><div class="dt"><select name="bwd"><option value="*">每天</option>${O.map(w=>`<option value="${w}">週${WD[w]}</option>`).join("")}</select>${tsel("bfrom","12:00",0,1440)}<span>–</span>${tsel("bto","13:00",0,1440)}</div><br><button class="btn g" data-act="addBlock">新增不可約時段</button></div></div>`+
+`<div class="card"><h4 style="margin-top:0">指定休假日</h4>`+(c.offDates.map(x=>`<div class="row"><span>${x}　週${WD[new Date(x+"T00:00").getDay()]}</span><button class="lk" data-act="delOff" data-od="${x}">刪除</button></div>`).join("")||`<div class="empty">尚未設定</div>`)+
+`<div data-f>${field("od","日期","date")}<button class="btn g" data-act="addOff">新增休假日</button></div></div>`+
+`<div class="card"><h4 style="margin-top:0">預設上課時長</h4><div class="chips">${[30,45,50,60,90].map(m=>`<button class="chp${c.len===m?" on":""}" data-act="lenq" data-v="${m}">${m} 分鐘</button>`).join("")}</div><div data-f><label>自訂時長（分鐘）</label><input name="len" type="number" min="15" max="240" step="5" value="${c.len}"><button class="btn g" data-act="savelen">套用</button></div><p class="sm2" style="margin-top:8px">新增的課程以此時長計算；已排好的課程不受影響。</p></div>`+
+`<div class="card"><h4 style="margin-top:0">上課場地設定</h4>${(()=>{const dp=c.places.find(x=>x.id===c.defPlace)||c.places[0],di=dp?dp.id:"";return c.places.map(p=>`<div class="row"><span>${esc(p.name)}${p.id===di?'<i class="pdef">預設</i>':""}</span><span class="acts2">${p.id!==di?`<button class="lk" data-act="defplace" data-pid="${p.id}">設為預設</button>`:""}<button class="lk r" data-act="delplace" data-pid="${p.id}">刪除</button></span></div>`).join("")||`<div class="empty">尚未設定場地</div>`})()}<div data-f>${field("pn","新增場地名稱","text","")}<button class="btn g" data-act="addplace">新增場地</button></div><p class="sm2" style="margin-top:8px">可設定多個地點並指定一個預設；也可在「我的學員」內為個別學員指定預設地點。</p></div>`}
+/* ===== 圖示與元件 ===== */
+const IC={grid:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
+cal:'<rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/>',bars:'<path d="M7 20v-6M12 20V6M17 20v-10"/>',
+user:'<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/>',users:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M16 5.5a3 3 0 0 1 0 6M17.5 14.2c2 .5 3 2.200 3 4.800"/>',
+pin:'<path d="M12 21s6.500-5.500 6.500-11a6.500 6.500 0 0 0-13 0c0 5.500 6.500 11 6.500 11z"/><circle cx="12" cy="10" r="2.300"/>',check:'<path d="M5 12.500l4.500 4.500L19 7.500"/>',
+star:'<path d="M12 3.800l2.500 5.200 5.700.8-4.100 4 1 5.700-5.100-2.700-5.100 2.700 1-5.700-4.100-4 5.700-.8z"/>',clock:'<circle cx="12" cy="12" r="8.500"/><path d="M12 7.500V12l3 2"/>',
+calp:'<rect x="4" y="5.5" width="16" height="14" rx="2.5"/><path d="M8 3.5v4M16 3.5v4M4 10h16M12 12.500v4.500M9.750 14.750h4.500"/>',note:'<path d="M6 3.500h9l3 3v14H6zM9 11h6M9 15h6"/>',chev:'<path d="M9.500 6l6 6-6 6"/>',up:'<path d="M6 14.500l6-6 6 6"/>',left:'<path d="M14.500 6l-6 6 6 6"/>',send:'<path d="M20 4L10 14M20 4l-6.500 16-3-6.500L4 10.500z"/>',
+gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.500M12 18.500V21M3 12h2.500M18.500 12H21M5.600 5.600l1.800 1.800M16.600 16.600l1.800 1.800M5.600 18.400l1.800-1.800M16.600 7.400l1.800-1.800"/>',
+inbox:'<path d="M4 13l2-7h12l2 7v5H4zM4 13h5l1 2h4l1-2h5"/>',arrow:'<path d="M7 17L17 7M9 7h8v8"/>',dump:'<path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/>'};
+const ic=(n,s=20)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</svg>`;
+const blk=(k,t,body,r="")=>`<details class="blk" data-k="${k}"><summary><span>${t}</span><small>${r}</small>${ic("chev",16)}</summary><div class="bd">${body}</div></details>`;
+const rows=a=>a.map(([k,v])=>`<div class="row"><span>${k}</span><span>${v}</span></div>`).join("");
+const field=(n,l,t="text",v="",x="")=>`<label>${l}</label><input name="${n}" type="${t}" value="${esc(v)}" ${x}>`;
+const gender=v=>`<label>生理性別</label><select name="gender"><option ${v==="男"?"selected":""}>男</option><option ${v==="女"?"selected":""}>女</option></select>`;
+const stp=(t,c)=>`<span class="stp ${c}">${t}</span>`;
+const brand=tag=>`<div class="brand"><span class="logo">${ic("arrow",16)}</span><b>動滋</b><span class="tag">${tag}</span></div>`;
+const hello=(t,s,av)=>`<div class="hello"><div><h1>${t}</h1><p>${s}</p></div><div class="avs">${av}</div></div>`;
+const avatar=(c,sz="")=>c.photo?`<img class="av ${sz}" src="${c.photo}" alt="">`:`<div class="av ${sz}">${esc((c.nick||c.name||"?")[0])}</div>`;
+const mrow=(i,t,r,tab)=>`<button class="mrow" data-act="tab" data-v="${tab}"><span class="mi">${ic(i,20)}</span><b>${t}</b><small>${r}</small>${ic("chev",16)}</button>`;
+const tabBar=(T,pend)=>`<nav class="tabs">${T.map(([k,n,i])=>`<button class="${S.tab===k?"on":""}" data-act="tab" data-v="${k}"><span>${ic(i,22)}${k==="req"&&pend?'<i class="dotr"></i>':""}</span>${n}</button>`).join("")}</nav>`;
+const pkName=p=>p.kind==="special"?"特別課程":(p.kind==="trial"||p.free)?"試上課程":`第 ${p.term} 期`,pkTitle=p=>(p.kind||p.free)?pkName(p):`第 ${p.term} 期課程`;
+const hasLog=l=>!!(l.log&&(l.log.text||(l.log.photos&&l.log.photos.length)));
+const shrink=(file,mx=820)=>new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,mx/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.72))};im.onerror=()=>res(null);im.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)});
+const copyText=async t=>{try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}};
+const logText=l=>{const x=new Date(l.start);return `【${x.getFullYear()}/${p2(x.getMonth()+1)}/${p2(x.getDate())}(${WD[x.getDay()]})${hm(x)}課程紀錄】\n${(l.log&&l.log.text)||"（未填寫上課內容）"}`};
+const TIMES=(()=>{const o=[];for(let m=360;m<=1410;m+=30)o.push(fm(m));return o})();
+function issues(ds,t){const c=cfg(),d=new Date(ds+"T00:00"),w=d.getDay(),m=tm(t),o=[];
+if(c.offDates.includes(ds)||c.offWd.includes(w))o.push("休息日");
+if(m<tm(c.open)||m+LEN>tm(c.close))o.push("非開放時段");
+if(c.blocks.some(b=>(b.wd==="*"||+b.wd===w)&&m<tm(b.to)&&m+LEN>tm(b.from)))o.push("固定不可約時段");
+let ex=null,ov=null;for(const l of db.lessons){if(l.status!=="scheduled"||!sameD(l.start,d))continue;const x=new Date(l.start),s0=x.getHours()*60+x.getMinutes();if(s0===m)ex=ex||l;else if(m<s0+(l.len||LEN)&&m+LEN>s0)ov=ov||l}
+const nm=l=>db.students[l.sid]?.name||"";
+if(ex)o.push("已有課程（"+nm(ex)+"）");
+if(ov){const x=new Date(ov.start),s0=x.getHours()*60+x.getMinutes();o.push("強碰（"+nm(ov)+" "+fm(s0)+"–"+fm(s0+(ov.len||LEN))+"）")}
+return o}
+const ST=[["home","課程","grid"],["book","預約","calp"],["hist","紀錄","bars"],["me","我的","user"]],CT=[["sch","課表","cal"],["req","課程安排","inbox"],["stu","學員","users"],["cfg","預約設定","gear"],["me","我的","user"]];
+/* ===== 註冊 ===== */
+const onboardS=()=>brand("學員區")+`<div data-f class="card"><h1>歡迎！</h1><p class="sm2">第一次使用，請先建立個人資料。</p>${field("name","姓名","text",S.lineName||"")}${field("phone","電話","tel")}${gender("")}${field("birthday","生日","date")}<label class="ck"><input type="checkbox" name="gcal">連動 Google 行事曆（可略過）</label><button class="btn" data-act="regStudent">建立資料</button></div>`;
+const onboardC=()=>brand("教練區")+`<div data-f class="card"><h1>教練註冊</h1><label>個人照</label><input name="photo" type="file" accept="image/*">${field("name","姓名")}${field("nick","綽號")}${field("phone","電話","tel")}${gender("")}<label>個人經歷（可換行）</label><textarea name="bio" rows="4"></textarea><label class="ck"><input type="checkbox" name="gcal" checked>連動 Google 行事曆</label><button class="btn" data-act="regCoach">完成註冊</button></div>`;
+/* ===== 學員端 ===== */
+const mineL=()=>db.lessons.filter(l=>l.sid===S.uid&&l.status==="scheduled"&&new Date(l.start)>Date.now()-36e5).sort((a,b)=>a.start.localeCompare(b.start));
+const histL=()=>db.lessons.filter(l=>l.sid===S.uid&&l.status==="done").sort((a,b)=>b.start.localeCompare(a.start));
+function pkCard(p){const n=p.total,dn=p.used.length,bk=p.book,big=n>20,all=S.exp[p.id],from=big&&!all?Math.max(0,Math.floor(dn/5)*5-5):0,to=big&&!all?Math.min(n,Math.ceil((dn+bk+1)/5)*5+5):n;let h=from>0?`<div class="cm">⋯ 前面 ${from} 堂已上完</div>`:"";
+for(let i=from;i<to;i++){const k=i<dn?"d":i<dn+bk?"b":"e";h+=`<div class="nd ${k}">${k=="d"?ic("check",24):k=="b"?ic("star",22):i+1}</div>`}
+if(to<n)h+=`<div class="cm">⋯ 後面還有 ${n-to} 堂</div>`;
+return `<div class="card"><div class="ch"><div><b>${pkTitle(p)}</b></div><span class="g">剩 ${p.remain} / 共 ${n} 堂</span></div><div class="nds">${h}</div>${big?`<button class="lk" data-act="expcells" data-pid="${p.id}">${all?"收合":"顯示全部 "+n+" 堂"}</button>`:""}<div class="pt">已完成 ${Math.round(dn/n*100)}%，穩穩向目標前進！</div></div>`}
+function sHome(){const s=db.students[S.uid],c=db.coach,pk=stats(S.uid),mine=mineL(),next=mine[0],more=mine.slice(1),hist=histL(),rem=remainOf(S.uid);
+let nx;if(next){const st=new Date(next.start),en=new Date(+st+(next.len||LEN)*6e4);
+nx=`<div class="dk"><div class="dkh"><span>最近一堂課</span><i class="pill2">已確認預約</i></div><div class="dkb"><div class="dbox"><small>${st.getMonth()+1} 月</small><b>${st.getDate()}</b></div><div><div class="dsub">週${WD[st.getDay()]}</div><div class="dtime">${hm(st)} – ${hm(en)}</div><div class="dloc">${ic("pin",14)} ${esc(next.place||"地點待確認")}</div></div></div><a class="wbtn" target="_blank" href="${gcal(next)}">${ic("calp",18)}加入行事曆</a>`+(more.length?`<button class="dfoot" data-act="more"><span>另有 ${more.length} 堂已預約 · ${md(more[0].start)} ${hm(more[0].start)}</span>${ic(S.more?"up":"chev",16)}</button>`+(S.more?more.map(l=>`<div class="drow"><span>${fmt(l.start)}</span><span>${esc(l.place)}</span></div>`).join(""):""):"")+`</div>`}
+else nx=`<div class="dk"><div class="dkh"><span>最近一堂課</span></div><p class="dsub" style="margin:12px 0 4px">目前沒有已確認的課程</p></div>`;
+return hello(`嗨，${esc(s.name)}！`,"每一次出發，都在累積更好的自己。",`<div class="avs">${esc(s.name[0])}</div>`.replace('<div class="avs">','<span>').replace('</div>','</span>'))+
+`<div class="stats"><div><b class="g">${hist.length}</b><span>已上</span></div><div><b class="bl">${mine.length}</b><span>預約</span></div><div><b>${rem}</b><span>剩堂</span></div></div>`+nx+
+`<button class="btn big" data-act="tab" data-v="book">預約上課 ${ic("calp",20)}</button><p class="cap">剩餘 ${rem} 堂含 ${mine.length} 堂已預約，還可安排 ${Math.max(0,rem-mine.length)} 堂</p>`+
+((()=>{const ac=pk.filter(p=>p.remain>0);return ac.length?ac.map(pkCard).join(""):`<div class="card empty">${pk.length?"目前沒有進行中的期數，請聯絡教練續約":"尚未購買期數"}</div>`})())+
+(c?`<button class="card crow" data-act="tab" data-v="me">${avatar(c,"sm")}<div><b>${esc(c.nick||c.name)}教練</b></div>${ic("chev",16)}</button>`:"")}
+function bkInit(){if(S.bk)return;const r=db.requests.find(x=>x.sid===S.uid&&x.status==="pending"),d=["","",""],t=["","",""];if(r)r.times.slice(0,3).forEach((x,i)=>{d[i]=ymd(new Date(x));t[i]=hm(x)});const same=!!r&&r.times.length>1&&new Set(d.filter(Boolean)).size===1;if(same)d.fill(d.find(Boolean));S.bk={same,act:0,d,t,ws:0}}
+function sBook(){bkInit();const B=S.bk,r=db.requests.find(x=>x.sid===S.uid&&x.status==="pending"),c=cfg(),mx=db.cfg.maxDays||30,A=[];const show=!r||S.bkEdit;
+for(let i=0;i<=mx;i++){const x=new Date();x.setDate(x.getDate()+i);const ds=ymd(x);A.push({ds,d:x,ok:slots(ds).length>0})}
+const win=A.slice(B.ws,B.ws+7),cur=B.d[B.same?0:B.act],n=[0,1,2].filter(i=>B.d[i]&&B.t[i]).length,ok=A.filter(a=>a.ok);
+const stp3=(k,t,st)=>`<div class="st ${st}"><i>${st==="done"?ic("check",14):k}</i>${t}</div>`;
+const strip=win.map(a=>`<button class="dy${a.ds===cur?" on":""}" ${a.ok?"":"disabled"} data-act="bkday" data-d="${a.ds}"><small>${WD[a.d.getDay()]}</small><b>${a.d.getDate()}</b></button>`).join("");
+const wish=[0,1,2].map(i=>{const L=B.d[i]?slots(B.d[i]):[];return `<div class="wish${B.act===i?" on":""}" data-act="bkact" data-i="${i}"><div class="wh"><span class="nb">${i+1}</span><b>第${"一二三"[i]}志願</b><button class="x" data-act="bkclr" data-i="${i}" aria-label="清除">—</button></div><div class="wf"><label class="df">${ic("calp",18)}<select name="bd${i}"><option value="">選日期</option>${ok.map(a=>`<option value="${a.ds}"${a.ds===B.d[i]?" selected":""}>${md(a.d)}</option>`).join("")}</select></label><select name="bt${i}" class="tm"><option value="">時間</option>${L.map(x=>`<option${x===B.t[i]?" selected":""}>${x}</option>`).join("")}</select></div></div>`}).join("");
+const wk=c.offWd.length?`固定休假：${[1,2,3,4,5,6,0].filter(w=>c.offWd.includes(w)).map(w=>"週"+WD[w]).join("、")}。`:"",od=c.offDates.filter(x=>x>=ymd(new Date())).slice(0,5);
+return brand("學員區")+`<h1 class="pg">下一次，想什麼時候練？</h1><div class="steps">${stp3(1,"選擇志願",r?"done":"cur")}${stp3(2,"教練確認",r?"cur":"")}${stp3(3,"正式上課","")}</div>`+
+(r?`<div class="card inf"><span class="mi">${ic("clock",20)}</span><div><b>申請已送出，等待教練確認</b><div class="wl">${r.times.map((x,i)=>`<div><span>第${"一二三"[i]}志願</span><b>${fmt(x)}</b></div>`).join("")}</div></div><button class="ebtn" data-act="bkedit">${S.bkEdit?"取消修改":"修改"}</button></div>`:"")+
+(show?`<div class="ymrow"><b>${win[0]?win[0].d.getFullYear()+" 年 "+(win[0].d.getMonth()+1)+" 月":""}</b><span><button data-act="bkw" data-v="-1" aria-label="前一週">${ic("left",18)}</button><button data-act="bkw" data-v="1" aria-label="後一週">${ic("chev",18)}</button></span></div><div class="strip">${strip}</div><p class="sm2">可選未來 ${mx} 天：${md(A[0].d).split(" ")[0]}–${md(A[A.length-1].d).split(" ")[0]}</p>`+
+`<div class="sec"><b>你的上課志願</b><span class="g">已選 ${n} / 3</span></div><label class="ck"><input type="checkbox" name="same" ${B.same?"checked":""}>預約同天，三個志願使用同一日期</label>${wish}`+
+`<div class="card inf"><span class="mi">${ic("clock",18)}</span><div><b>每堂 ${LEN} 分鐘 · 每 ${c.step||30} 分鐘一個開始時段</b><small>每日 ${c.open}–${c.close} 開放，最晚 ${fm(tm(c.close)-LEN)} 開課。${wk}${od.length?"指定休假日："+od.map(x=>x.slice(5).replace("-","/")).join("、")+"。":""}</small></div></div>`+
+`<button class="btn big" data-act="req">${r?"更新約課申請":"送出約課申請"} ${ic("send",20)}</button><p class="cap">${r?"修改志願後，仍需等待教練確認":"送出後，等待教練確認其中一個時段"}</p>`:"")}
+function sHist(){const pk=stats(S.uid),h=histL(),seen=new Set();pk.forEach(p=>p.used.forEach(l=>seen.add(l.id)));const rest=h.filter(l=>!seen.has(l.id));
+const row=l=>`<button class="hrow" data-act="openlog" data-id="${l.id}"><span class="hck">${ic("check",16)}</span><b>${fmt(l.start)}</b><small>${esc(l.place)}${hasLog(l)?" · 有紀錄":""}</small>${ic("chev",14)}</button>`;
+const grp=(k,t,list,r,o)=>list.length?`<details class="blk" data-k="${k}"${o?" open":""}><summary><span>${t}</span><small>${r}</small>${ic("chev",16)}</summary><div class="bd">${list.slice().reverse().map(row).join("")}</div></details>`:"";
+return brand("學員區")+`<h1 class="pg">上課紀錄</h1><p class="sub">已完成 ${h.length} 堂，依期數分類</p>`+pk.slice().reverse().map((p,i)=>grp("h"+p.id,pkName(p),p.used,`已上 ${p.used.length}/${p.total} 堂`,i===0)).join("")+grp("hrest","其他紀錄",rest,rest.length+" 堂",!pk.length)+(h.length?"":`<div class="card empty">還沒有上課紀錄</div>`)}
+function sMe(){const s=db.students[S.uid],c=db.coach;return brand("學員區")+`<h1 class="pg">個人資料</h1><div class="card">${rows([["姓名",esc(s.name)],["電話",esc(s.phone)],["性別",s.gender],["生日",s.birthday||"—"]])}<div class="row"><span>Google 行事曆連動</span><input type="checkbox" data-act="gcalToggle" ${s.gcal?"checked":""}></div></div>`+(c?`<div class="card"><div class="crow2">${avatar(c)}<div><b>${esc(c.nick||c.name)}教練 · ${esc(c.name)}</b><small>${c.gender}・${esc(c.phone)}</small></div></div><p class="bio">${esc(c.bio)}</p></div>`:"")}
+function studentBody(){return S.tab==="book"?sBook():S.tab==="hist"?sHist():S.tab==="me"?sMe():sHome()}
+/* ===== 教練端 ===== */
+const sn0=id=>esc(db.students[id]?.name||"?");
+function reqCards(){const pend=db.requests.filter(r=>r.status==="pending");return pend.map(r=>{const k=S.pk[r.id]??0,t=r.times[Math.min(k,r.times.length-1)],same=new Set(r.times.map(x=>ymd(new Date(x)))).size===1;
+return `<div class="card rq" data-f data-rid="${r.id}"><div class="rqh"><b>${sn0(r.sid)}</b><i class="chipx w">待確認</i></div><div class="sm2">${r.at?md(r.at)+" 送出 · ":""}${same?md(r.times[0])+" · ":""}選一個志願確認上課</div><div class="opts">${r.times.map((x,i)=>`<button class="op${i===k?" on":""}" data-act="pick" data-rid="${r.id}" data-i="${i}"><small>第${"一二三"[i]}志願</small><b>${hm(x)}</b>${same?"":`<small>${md(x)}</small>`}</button>`).join("")}</div><label class="locl">${ic("pin",14)}${placeSel("place",stuPlace(r.sid))}</label><div class="rqb"><button class="btn" data-act="confirmReq" data-i="${k}">確認 ${same?hm(t):fmt(t)} 上課</button><button class="lk r" data-act="rejectReq">婉拒</button></div></div>`}).join("")||`<div class="empty">沒有待確認的申請</div>`}
+function stuList(){const e=Object.entries(db.students);return e.length?`<div class="card mn">${e.map(([id,u])=>`<button class="mrow" data-act="openstu" data-sid="${id}"><span class="mi">${esc((u.name||"?")[0])}</span><b>${esc(u.name)}</b><small>剩 ${remainOf(id)} 堂</small>${ic("chev",16)}</button>`).join("")}</div>`:`<div class="card empty">還沒有學員。請學員從學員連結進入並建立資料。</div>`}
+function stuPage(id){const u=db.students[id],pk=stats(id),notes=db.notes.filter(n=>n.sid===id).sort((a,b)=>b.ts-a.ts);
+const lrow=l=>`<button class="hrow" data-act="openlog" data-id="${l.id}"><span class="hck">${ic("check",16)}</span><b>${fmt(l.start)}</b><small>${hasLog(l)?"有紀錄":"上課紀錄"}</small>${ic("chev",14)}</button>`;
+return brand("教練區")+`<button class="back" data-act="stuback">${ic("left",18)}我的學員</button><h1 class="pg">${esc(u.name)}</h1><p class="sub">剩 ${remainOf(id)} 堂</p>`+
+`<div class="card" data-f data-sid="${id}"><h4 style="margin-top:0">基本資料</h4>${field("name","姓名","text",u.name)}${field("phone","電話","tel",u.phone)}${gender(u.gender)}${field("birthday","生日","date",u.birthday||"")}<button class="btn g" data-act="saveStu">儲存資料</button></div>`+
+`<div class="card"><h4 style="margin-top:0">預設上課地點</h4>${PL().length?`<select name="sp" data-sid="${id}"><option value="">跟隨教練預設（${esc(defPlace()||"未設定")}）</option>${PL().map(p=>`<option value="${p.id}"${u.place===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}</select>`:`<p class="sm2">請先到「預約設定」新增上課場地。</p>`}</div>`+
+`<div class="card"><h4 style="margin-top:0">課程期數</h4>${pk.slice().reverse().map(p=>blk("p"+p.id,pkName(p),rows([["教練費","$"+p.fee],["付款日期",p.paid],["付款方式",esc(p.method)]])+(p.used.length?p.used.slice().reverse().map(lrow).join(""):`<div class="empty">尚未上課</div>`),`剩 ${p.remain}/${p.total}`)).join("")||`<div class="empty">尚無期數</div>`}</div>`+
+`<div class="card" data-f data-sid="${id}"><h4 style="margin-top:0">新增期數</h4>${field("fee","教練費","number")}${field("total","堂數","number")}${field("paid","付款日期","date",loc(new Date()).slice(0,10))}${field("method","付款方式","text","轉帳")}<label class="ck"><input type="checkbox" name="trial">試上課程</label><label class="ck"><input type="checkbox" name="special">特別課程</label><p class="sm2" style="margin:6px 0 10px">試上課/特別課皆不列入期數計算</p><button class="btn" data-act="addPkg">新增期數</button></div>`+
+`<div class="card"><h4 style="margin-top:0">備注</h4>${notes.map(n=>`<div class="nrow"><span>${esc(n.text)}<br><small>${new Date(n.ts).toLocaleDateString("zh-TW")}</small></span><button class="lk r" data-act="delNote" data-nid="${n.id||n.ts}">刪除</button></div>`).join("")||`<div class="empty">還沒有備注</div>`}<div data-f data-sid="${id}"><textarea name="text" rows="2" placeholder="新增備注"></textarea><button class="btn g" data-act="addNote">新增備注</button></div></div>`}
+function logPage(){const l=db.lessons.find(x=>x.id===S.log.id);if(!l)return"";const co=S.coachMode,ed=co&&S.log.edit,lg=l.log||{},ph=S.log.ph||lg.photos||[],tx=S.log.text!==undefined?S.log.text:(lg.text||"");
+const who=co?sn0(l.sid):esc((db.coach&&(db.coach.nick||db.coach.name))||"")+"教練";
+const info=`<div class="card"><div class="rqh"><b>${who}</b><i class="chipx gy">${l.len||LEN} 分鐘</i></div><div class="sm2">${fmt(l.start)} · ${esc(l.place||"地點未填")}</div></div>`;
+const back=`<button class="back" data-act="logback">${ic("left",18)}返回</button><h1 class="pg">上課紀錄</h1>`;
+if(ed)return back+info+`<div class="card" data-f data-id="${l.id}"><h4 style="margin-top:0">上課內容</h4><textarea name="text" rows="6" placeholder="今天的訓練重點、動作調整、下次目標…">${esc(tx)}</textarea><h4>照片（最多 6 張）</h4><div class="phs">${ph.map((u,i)=>`<div class="ph"><img src="${u}" alt=""><button data-act="rmphoto" data-i="${i}" aria-label="移除照片">×</button></div>`).join("")}</div><input name="photos" type="file" accept="image/*" multiple><div class="rqb"><button class="btn" data-act="savelog">儲存</button><button class="lk" data-act="cancellog">取消</button></div></div>`;
+return back+info+`<div class="card"><h4 style="margin-top:0">上課內容</h4><p class="bio" style="margin:0">${lg.text?esc(lg.text):"教練尚未填寫上課內容"}</p>${(lg.photos||[]).length?`<div class="pgrid">${lg.photos.map(u=>`<img src="${u}" alt="上課照片">`).join("")}</div>`:""}</div><div class="rqb"><button class="btn g" data-act="copylog">${ic("note",18)}複製</button><button class="btn g" data-act="sharelog">${ic("send",18)}分享</button>${co?`<button class="btn" data-act="editlog">編輯</button>`:""}</div>`}
+function schPage(){const B=S.sch,st=Object.entries(db.students),A=[];for(let i=0;i<=60;i++){const x=new Date();x.setDate(x.getDate()+i);A.push({ds:ymd(x),d:x})}
+const win=A.slice(B.ws,B.ws+7),off=ds=>cfg().offDates.includes(ds)||cfg().offWd.includes(new Date(ds+"T00:00").getDay()),nc=ds=>db.lessons.filter(l=>l.status==="scheduled"&&sameD(l.start,ds+"T00:00")).length;
+const strip=win.map(a=>`<button class="dy${a.ds===B.d?" on":""}" data-act="schday" data-d="${a.ds}"><small>${WD[a.d.getDay()]}</small><b>${a.d.getDate()}</b><span class="mk">${off(a.ds)?"<em>休</em>":""}${nc(a.ds)?`<i class="ct">${nc(a.ds)}</i>`:""}</span></button>`).join("");
+const tag=t=>{const i=B.d?issues(B.d,t):[];return i.length?"（"+i.map(x=>x.startsWith("已有")?"已排課":x.startsWith("強碰")?"強碰":x==="非開放時段"?"非開放":x==="固定不可約時段"?"不可約":x).join("、")+"）":""};
+return brand("教練區")+`<button class="back" data-act="schback">${ic("left",18)}課程安排</button><h1 class="pg">排課</h1><p class="sub">為學員直接安排一堂課。</p>`+
+`<div class="card"><div class="sh">學員</div><select name="ssid"><option value="">選擇學員</option>${st.map(([id,u])=>`<option value="${id}"${id===B.sid?" selected":""}>${esc(u.name)}</option>`).join("")}</select>`+
+`<div class="ymrow"><b>${win[0].d.getFullYear()} 年 ${win[0].d.getMonth()+1} 月</b><span><button data-act="schw" data-v="-1" aria-label="前一週">${ic("left",18)}</button><button data-act="schw" data-v="1" aria-label="後一週">${ic("chev",18)}</button></span></div><div class="strip">${strip}</div>`+
+`<div class="wf"><label class="df">${ic("cal",18)}<select name="sd"><option value="">選日期</option>${A.map(a=>`<option value="${a.ds}"${a.ds===B.d?" selected":""}>${md(a.d)}</option>`).join("")}</select></label><select name="st" class="tm"><option value="">時間</option>${TIMES.map(t=>`<option value="${t}"${t===B.t?" selected":""}>${t}${tag(t)}</option>`).join("")}</select></div>`+
+`<div class="sh" style="margin-top:14px">上課地點</div>${placeSel("spl",B.pl||stuPlace(B.sid))}<button class="btn" data-act="schgo">排入課表</button></div>`}
+function coachBody(){const c=db.coach,sn=sn0,cd=new Date(S.cd);cd.setHours(0,0,0,0);
+const on=day=>db.lessons.filter(l=>sameD(l.start,day)).sort((a,b)=>a.start.localeCompare(b.start));
+const nb=v=>`<button data-act="nav" data-v="${v}" aria-label="${v>0?"下一個":"上一個"}">${ic(v>0?"chev":"left",18)}</button>`;
+let cal;
+if(S.cv==="d"){const L=on(cd),dn=L.filter(l=>l.status==="done").length,now=new Date();let nl=!sameD(cd,now),h="";
+for(const l of L){if(!nl&&new Date(l.start)>now){h+=`<div class="nowl"><b>${hm(now)}</b><i></i><span>接下來</span></div>`;nl=true}
+const d_=l.status==="done",ln=l.len||LEN;
+h+=`<div class="tl"><div class="tt"><b>${hm(l.start)}</b><small>${hm(+new Date(l.start)+ln*6e4)}</small></div><div class="tcd${d_?" dn":""}"><div class="tr"><b>${sn(l.sid)}</b><i class="chipx ${d_?"gy":"gr"}">${d_?"已完課":"已預約"}</i></div><div class="sm2">${ln} 分鐘 · ${esc(l.place||"地點未填")}</div>`+(d_?`<div class="ta" data-id="${l.id}"><button class="ok" data-act="openlog">${ic("note",14)}上課紀錄${hasLog(l)?" ✓":""}</button><button class="cx" data-act="undone">取消完課</button></div>`:S.edit===l.id?`<div data-f data-id="${l.id}">${field("sd","日期","date",ymd(new Date(l.start)))}<label>時間</label>${tsel("st",hm(l.start),0,1410)}${field("len","上課時長（分鐘）","number",ln,'min="15" max="240" step="5"')}<label>地點</label>${placeSel("place",l.place)}<div class="ta"><button class="ok" data-act="saveEdit">儲存</button><button class="md" data-act="cancelEdit">放棄修改</button></div></div>`:`<div class="ta" data-id="${l.id}"><button class="ok" data-act="done">${ic("check",14)}完課</button><button class="md" data-act="edit">修改</button><button class="cx" data-act="cancel">取消</button></div>`)+`</div></div>`}
+cal=`<div class="nav">${nb(-1)}<div class="ndt"><b>${cd.getMonth()+1} 月 ${cd.getDate()} 日 · 週${WD[cd.getDay()]}</b><small>${cd.getFullYear()}</small></div>${nb(1)}</div><div class="sum"><span>共 ${L.length} 堂 · 已完成 ${dn} · 已預約 ${L.length-dn}</span>${sameD(cd,now)?`<span class="tdy">今天</span>`:`<button class="tdy" data-act="today">移至今天</button>`}</div>${h||`<div class="empty">${cfg().offDates.includes(ymd(cd))||cfg().offWd.includes(cd.getDay())?"休息日":"這天沒有課程"}</div>`}`}
+else if(S.cv==="w"){const w0=new Date(cd);w0.setDate(w0.getDate()-(w0.getDay()+6)%7);let h="";
+for(let i=0;i<7;i++){const d=new Date(w0);d.setDate(w0.getDate()+i);h+=`<div class="wc${sameD(d,new Date())?" td":""}" data-act="goto" data-d="${d.toISOString()}"><b>${WD[d.getDay()]}</b><span class="sm2">${d.getDate()}</span>`+on(d).map(l=>`<div class="chip ${l.status==="done"?"d":"b"}">${hm(l.start)}<br>${sn(l.sid).slice(0,3)}</div>`).join("")+`</div>`}
+const e=new Date(w0);e.setDate(e.getDate()+6);cal=`<div class="nav">${nb(-1)}<b>${w0.getMonth()+1}/${w0.getDate()} – ${e.getMonth()+1}/${e.getDate()}</b>${nb(1)}</div><div class="wk">${h}</div><div class="sm2">點選日期可看當天明細</div>`}
+else{const m0=new Date(cd.getFullYear(),cd.getMonth(),1),off=(m0.getDay()+6)%7,n=Math.ceil((off+new Date(cd.getFullYear(),cd.getMonth()+1,0).getDate())/7)*7;let h=WD.split("").map((x,i)=>"").join("");
+h="一二三四五六日".split("").map(x=>`<div style="text-align:center;font:700 13px var(--fs)">${x}</div>`).join("");
+for(let i=0;i<n;i++){const d=new Date(m0);d.setDate(1-off+i);const L=on(d),inm=d.getMonth()===m0.getMonth();h+=`<div class="mc${inm?"":" x"}${sameD(d,new Date())?" td":""}" data-act="goto" data-d="${d.toISOString()}"><span>${d.getDate()}</span>${L.length?stp(L.length,L.some(l=>l.status==="scheduled")?"b":"d"):""}</div>`}
+cal=`<div class="nav">${nb(-1)}<b>${m0.getFullYear()} 年 ${m0.getMonth()+1} 月</b>${nb(1)}</div><div class="mo">${h}</div><div class="sm2">${stp("完","d").replace('class="stp','class="stp" style="width:16px;height:16px;font-size:9px;vertical-align:middle" data-x="')} 已上完　${stp("預","b").replace('class="stp','class="stp" style="width:16px;height:16px;font-size:9px;vertical-align:middle" data-x="')} 已預約　（圈內＝堂數）</div>`}
+const seg=[["d","日"],["w","週"],["m","月"]].map(([k,n])=>`<button class="${S.cv===k?"on":""}" data-act="cv" data-v="${k}">${n}</button>`).join("");
+const head=hello(`${esc(c.nick||c.name)}教練，早安！`,"今天也陪學員，進步一點點。",ic("dump",28));
+const pg=t=>brand("教練區")+`<h1 class="pg">${t}</h1>`;
+if(S.tab==="req")return S.sch?schPage():pg("課程安排")+`<button class="btn big" data-act="schopen" style="margin-bottom:12px">${ic("calp",20)}排課</button>`+reqCards();
+if(S.tab==="stu")return S.stuId&&db.students[S.stuId]?stuPage(S.stuId):pg("我的學員")+stuList();
+if(S.tab==="cfg")return pg("預約設定")+cfgB();
+if(S.tab==="me")return pg("教練資料")+`<div class="card" data-f>${field("name","姓名","text",c.name)}${field("nick","綽號","text",c.nick)}${field("phone","電話","tel",c.phone)}<label>個人經歷（可換行）</label><textarea name="bio" rows="4">${esc(c.bio)}</textarea><label>個人照</label><input name="photo" type="file" accept="image/*"><label class="ck"><input type="checkbox" name="gcal" ${c.gcal?"checked":""}>Google 行事曆連動</label><button class="btn" data-act="saveCoach">儲存</button></div>`;
+return brand("教練區")+head+`<div class="seg">${seg}</div><div class="cal">${cal}</div>`}
+/* ===== 渲染 ===== */
+function render(){
+const open=new Set([...document.querySelectorAll("details[open]")].map(d=>d.dataset.k));
+let h,tabs=null,pend=false;
+if(S.coachMode){if(!db.coach)h=onboardC();else if(db.coach.uid!==S.uid)h=brand("教練區")+`<div class="card"><h1>無法進入</h1><p class="sm2">這個連結只提供教練使用。</p></div>`;else{S.tab=S.tab||"sch";h=S.log?brand("教練區")+logPage():coachBody();tabs=CT;pend=db.requests.some(r=>r.status==="pending")}}
+else if(!db.students[S.uid])h=onboardS();else{S.tab=S.tab||"home";h=S.log?brand("學員區")+logPage():studentBody();tabs=ST}
+if(S.demo)h+=`<footer>示範模式（資料只存在這支瀏覽器）<br><a href="?">學員視角</a>・<a href="?role=coach">教練視角</a>・<a href="#" data-act="newStu">換成新學員</a>・<a href="#" data-act="reset">清除資料</a></footer>`;
+app.innerHTML=h+(tabs?tabBar(tabs,pend):"");
+document.querySelectorAll("details").forEach(d=>{if(open.has(d.dataset.k))d.open=true});
+}
+/* ===== 事件 ===== */
+const rd=f=>Object.fromEntries([...f.querySelectorAll("[name]")].map(i=>[i.name,i.type==="checkbox"?i.checked:i.value.trim()]));
+const photoOf=file=>new Promise(res=>{if(!file)return res(null);const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement("canvas"),k=240/Math.min(im.width,im.height);c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.8))};im.src=r.result};r.readAsDataURL(file)});
+document.addEventListener("click",async e=>{
+const b=e.target.closest("[data-act]");if(!b||b.type==="checkbox")return;
+const a=b.dataset.act,f=b.closest("[data-f]"),d=f?rd(f):{},sid=f?.dataset.sid,id=b.closest("[data-id]")?.dataset.id;
+if(a==="theme"){const v=b.dataset.v,u=S.coachMode?db.coach:db.students[S.uid];if(u){u.theme=v;commit()}else{S.tmp=v;document.documentElement.dataset.th=v;document.querySelectorAll(".tc").forEach(x=>x.classList.toggle("on",x.dataset.v===v))}return}
+if(a==="newStu"){e.preventDefault();localStorage.cb_uid="U"+rid();location.href="?";return}
+if(a==="reset"){e.preventDefault();if(confirm("確定清除所有示範資料？")){localStorage.clear();location.href="?"}return}
+if(["cv","goto","nav"].includes(a))S.edit=null;
+if(a==="edit"){S.edit=id;return render()}
+if(a==="cancelEdit"){S.edit=null;return render()}
+if(a==="expcells"){S.exp[b.dataset.pid]=!S.exp[b.dataset.pid];return render()}
+if(a==="histall"){S.hist=!S.hist;return render()}
+if(a==="tab"){S.tab=b.dataset.v;S.edit=null;S.log=null;S.sch=null;S.stuId=null;if(S.tab!=="book"){S.bk=null;S.bkEdit=false}window.scrollTo&&window.scrollTo(0,0);return render()}
+if(a==="bkedit"){S.bkEdit=!S.bkEdit;S.bk=null;return render()}
+if(a==="today"){S.cd=new Date();return render()}
+if(a==="pick"){S.pk[b.dataset.rid]=+b.dataset.i;return render()}
+if(a==="bkact"){if(!e.target.closest("select")){S.bk.act=+b.dataset.i;render()}return}
+if(a==="bkday"){setD(S.bk.same?0:S.bk.act,b.dataset.d);return render()}
+if(a==="bkclr"){e.stopPropagation&&e.stopPropagation();const i=+b.dataset.i;S.bk.d[i]="";S.bk.t[i]="";return render()}
+if(a==="bkw"){const m=Math.max(0,Math.min((db.cfg.maxDays||30)-6,S.bk.ws+7*(+b.dataset.v)));S.bk.ws=m;return render()}
+if(a==="openstu"){S.stuId=b.dataset.sid;window.scrollTo&&window.scrollTo(0,0);return render()}
+if(a==="stuback"){S.stuId=null;return render()}
+if(a==="openlog"){const l=db.lessons.find(x=>x.id===id);if(!l)return;S.log={id:l.id,edit:S.coachMode&&!hasLog(l)};window.scrollTo&&window.scrollTo(0,0);return render()}
+if(a==="logback"){S.log=null;return render()}
+if(a==="editlog"){S.log.edit=true;S.log.ph=undefined;S.log.text=undefined;return render()}
+if(a==="cancellog"){S.log={id:S.log.id,edit:false};return render()}
+if(a==="rmphoto"){const l=db.lessons.find(x=>x.id===S.log.id);S.log.ph=S.log.ph||[...((l.log&&l.log.photos)||[])];S.log.ph.splice(+b.dataset.i,1);S.log.text=d.text;return render()}
+if(a==="copylog"){await copyText(logText(db.lessons.find(x=>x.id===S.log.id)));return alert("已複製到剪貼簿")}
+if(a==="sharelog"){const t=logText(db.lessons.find(x=>x.id===S.log.id));if(navigator.share){try{await navigator.share({title:"上課紀錄",text:t})}catch(e){}}else{await copyText(t);alert("已複製，可直接貼到 LINE 分享")}return}
+if(a==="savelog"){const l=db.lessons.find(x=>x.id===S.log.id),fi=f.querySelector("[name=photos]"),files=[...((fi&&fi.files)||[])],ph=[...(S.log.ph||(l.log&&l.log.photos)||[])];
+for(const x of files){if(ph.length>=6){alert("最多 6 張照片，多出的未加入");break}const u=await shrink(x);if(u)ph.push(u)}
+const prev=l.log;l.log={text:d.text,photos:ph,at:Date.now()};try{store.save(db)}catch(e){l.log=prev;return alert("儲存空間不足，請減少照片數量或改用較小的照片")}S.log={id:l.id,edit:false};return render()}
+if(a==="schopen"){S.sch={sid:"",d:"",t:"",pl:"",ws:0};return render()}
+if(a==="schback"){S.sch=null;return render()}
+if(a==="schday"){S.sch.d=b.dataset.d;return render()}
+if(a==="schw"){S.sch.ws=Math.max(0,Math.min(56,S.sch.ws+7*(+b.dataset.v)));return render()}
+if(a==="schgo"){const B=S.sch;if(!B.sid||!B.d||!B.t)return alert("請選擇學員、日期和時間");const is=issues(B.d,B.t);if(is.length&&!confirm(`這個時段：${is.join("、")}\n\n仍要強制排課嗎？`))return;db.lessons.push({id:rid(),sid:B.sid,start:new Date(B.d+"T"+B.t).toISOString(),place:B.pl||stuPlace(B.sid),len:LEN,status:"scheduled"});S.cd=new Date(B.d+"T00:00");S.sch=null;store.save(db);alert("已排課");return render()}
+if(a==="more"){S.more=!S.more;return render()}
+if(a==="cv"){S.cv=b.dataset.v;return render()}
+if(a==="goto"){S.cd=new Date(b.dataset.d);S.cv="d";return render()}
+if(a==="nav"){const v=+b.dataset.v,x=new Date(S.cd);if(S.cv==="d")x.setDate(x.getDate()+v);else if(S.cv==="w")x.setDate(x.getDate()+7*v);else{x.setDate(1);x.setMonth(x.getMonth()+v)}S.cd=x;return render()}
+const need=(...k)=>k.every(x=>d[x])||(alert("請填寫完整"),false);
+if(a==="regStudent"){if(!need("name","phone","birthday"))return;db.students[S.uid]={name:d.name,phone:d.phone,gender:d.gender,birthday:d.birthday,gcal:d.gcal,theme:S.tmp||"r"};FIRST=true}
+if(a==="regCoach"){if(!need("name","phone"))return;db.coach={uid:S.uid,name:d.name,nick:d.nick,phone:d.phone,gender:d.gender,bio:d.bio,gcal:d.gcal,theme:S.tmp||"r",photo:await photoOf(f.querySelector("[name=photo]").files[0])};FIRST=true}
+if(a==="saveCoach"){const p=await photoOf(f.querySelector("[name=photo]").files[0]);Object.assign(db.coach,{name:d.name,nick:d.nick,phone:d.phone,bio:d.bio,gcal:d.gcal});if(p)db.coach.photo=p}
+if(a==="req"){const B=S.bk;if(!B)return;const t=[];for(const i of[0,1,2]){if(B.d[i]&&B.t[i])t.push(new Date(B.d[i]+"T"+B.t[i]).toISOString());else if(B.t[i]||(B.d[i]&&!B.same))return alert("第"+"一二三"[i]+"志願的日期和時間要一起選")}
+if(!t.length)return alert("請至少選 1 個志願時段");if(new Set(t).size<t.length)return alert("時段不可重複");if(t.some(x=>!okSlot(x)))return alert("所選時段目前不開放，請重新選擇");
+const r=db.requests.find(x=>x.sid===S.uid&&x.status==="pending");if(r){r.times=t;r.at=Date.now()}else db.requests.push({id:rid(),sid:S.uid,times:t,status:"pending",at:Date.now()});S.bk=null;S.bkEdit=false;alert("已送出約課申請，請等候教練確認")}
+if(a==="confirmReq"){const r=db.requests.find(x=>x.id===f.dataset.rid),t=r.times[+b.dataset.i],clash=db.lessons.some(l=>l.status==="scheduled"&&Math.abs(new Date(l.start)-new Date(t))<LEN*6e4);
+if(!confirm(`確認安排「${db.students[r.sid]?.name||""}」上課？\n\n時間：${fmt(t)}\n地點：${d.place||"未填"}`+(clash?"\n\n⚠ 這個時段與其他已預約的課程重疊":"")))return;
+r.status="confirmed";db.lessons.push({id:rid(),sid:r.sid,start:t,place:d.place,len:LEN,status:"scheduled"})}
+if(a==="rejectReq"){db.requests.find(x=>x.id===f.dataset.rid).status="rejected"}
+if(a==="addLesson"){if(!need("sd","st"))return;db.lessons.push({id:rid(),sid,start:new Date(d.sd+"T"+d.st).toISOString(),place:d.place,status:"scheduled"})}
+if(a==="saveCfg"){if(tm(d.close)-tm(d.open)<LEN)return alert("結束時間至少要比開始時間晚 "+LEN+" 分鐘");Object.assign(db.cfg,{open:d.open,close:d.close,maxDays:Math.max(1,+d.maxDays||30),step:(d.stp60&&!d.stp30)?60:30,offWd:[0,1,2,3,4,5,6].filter(w=>d["wd"+w])})}
+if(a==="addBlock"){if(tm(d.bto)<=tm(d.bfrom))return alert("結束時間需晚於開始時間");db.cfg.blocks=(db.cfg.blocks||[]).concat({id:rid(),wd:d.bwd,from:d.bfrom,to:d.bto})}
+if(a==="delBlock"){db.cfg.blocks=(db.cfg.blocks||[]).filter(x=>x.id!==b.dataset.bid)}
+if(a==="addOff"){if(!need("od"))return;db.cfg.offDates=[...new Set([...(db.cfg.offDates||[]),d.od])].sort()}
+if(a==="delOff"){db.cfg.offDates=(db.cfg.offDates||[]).filter(x=>x!==b.dataset.od)}
+if(a==="done"){const l=db.lessons.find(x=>x.id===id);if(!confirm(`確認「${db.students[l.sid]?.name||""}」${fmt(l.start)} 這堂課已完課？\n\n完課後會從課程期數扣除 1 堂。`))return;l.status="done"}
+if(a==="undone"){const l=db.lessons.find(x=>x.id===id);if(!confirm(`確定取消「${db.students[l.sid]?.name||""}」${fmt(l.start)} 的完課？\n\n這堂課會回到「已預約」狀態，並重新計入剩餘堂數。`))return;l.status="scheduled"}
+if(a==="cancel"){const l=db.lessons.find(x=>x.id===id);if(!confirm(`確定取消「${db.students[l.sid]?.name||""}」${fmt(l.start)} 的課程？\n\n取消後會從行事曆移除。`))return;db.lessons=db.lessons.filter(x=>x.id!==id)}
+if(a==="saveEdit"){if(!need("sd","st"))return;const l=db.lessons.find(x=>x.id===id),t=new Date(d.sd+"T"+d.st).toISOString(),ol=l.len||LEN,nl=Math.round(+d.len)||ol;if(!(nl>=15&&nl<=240))return alert("請輸入 15–240 分鐘");
+const clash=db.lessons.some(x=>x.id!==id&&x.status==="scheduled"&&Math.abs(new Date(x.start)-new Date(t))<Math.max(nl,x.len||LEN)*6e4);
+if(!confirm(`確認修改「${db.students[l.sid]?.name||""}」的課程？\n\n原時間：${fmt(l.start)}\n新時間：${fmt(t)}\n時長：${nl===ol?nl+" 分鐘":ol+" → "+nl+" 分鐘"}\n地點：${d.place||"未填"}`+(clash?"\n\n⚠ 這個時段與其他已預約的課程重疊":"")))return;l.start=t;l.len=nl;l.place=d.place;S.cd=new Date(t);S.edit=null}
+if(a==="lenq"){db.cfg.len=+b.dataset.v;syncLen()}
+if(a==="savelen"){const v=Math.round(+d.len);if(!(v>=15&&v<=240))return alert("請輸入 15–240 分鐘");db.cfg.len=v;syncLen()}
+if(a==="addplace"){if(!need("pn"))return;const c0=cfg();db.cfg.places=[...c0.places,{id:rid(),name:d.pn}];if(!c0.defPlace)db.cfg.defPlace=db.cfg.places[0].id}
+if(a==="delplace"){if(!confirm("確定刪除這個場地？"))return;db.cfg.places=cfg().places.filter(x=>x.id!==b.dataset.pid);if(db.cfg.defPlace===b.dataset.pid)db.cfg.defPlace=(db.cfg.places[0]||{}).id||""}
+if(a==="defplace"){db.cfg.defPlace=b.dataset.pid}
+if(a==="addPkg"){if(d.trial&&d.special)return alert("試上課程與特別課程只能擇一");const kd=d.trial?"trial":d.special?"special":"";if(!d.total||!d.paid||(!kd&&d.fee===""))return alert("請填寫完整");db.packages.push({id:rid(),sid,term:kd?null:db.packages.filter(p=>p.sid===sid&&!p.free&&!p.kind).length+1,kind:kd,free:!!kd,fee:+d.fee||0,total:+d.total,paid:d.paid,method:d.method})}
+if(a==="saveStu"){if(!need("name","phone"))return;Object.assign(db.students[sid],{name:d.name,phone:d.phone,gender:d.gender,birthday:d.birthday})}
+if(a==="addNote"){if(!need("text"))return;db.notes.push({id:rid(),sid,text:d.text,ts:Date.now()})}
+if(a==="delNote"){if(!confirm("確定刪除這則備注？"))return;db.notes=db.notes.filter(n=>String(n.id||n.ts)!==b.dataset.nid)}
+commit();
+});
+const setD=(i,v)=>{const B=S.bk,f=j=>{B.d[j]=v;if(B.t[j]&&!(v&&slots(v).includes(B.t[j])))B.t[j]=""};if(B.same)[0,1,2].forEach(f);else f(i)};
+document.addEventListener("change",e=>{const t=e.target,B=S.bk,n=t.name||"";
+if(t.dataset&&t.dataset.act==="gcalToggle"){db.students[S.uid].gcal=t.checked;return commit()}
+const EX={stp30:"stp60",stp60:"stp30",trial:"special",special:"trial"};
+if(EX[n]){if(t.checked){const fm0=t.closest("[data-f]"),o=fm0&&fm0.querySelector(`[name=${EX[n]}]`);if(o)o.checked=false}return}
+if(n==="sp"){db.students[t.dataset.sid].place=t.value;return commit()}
+if(S.sch&&/^(ssid|sd|st|spl)$/.test(n)){const C=S.sch;if(n==="ssid"){C.sid=t.value;C.pl=t.value?stuPlace(t.value):""}else if(n==="sd")C.d=t.value;else if(n==="st")C.t=t.value;else C.pl=t.value;return render()}
+if(!B)return;
+if(/^bd\d$/.test(n)){setD(+n[2],t.value);render()}
+else if(/^bt\d$/.test(n)){B.t[+n[2]]=t.value;render()}
+else if(n==="same"){B.same=t.checked;if(t.checked)setD(0,B.d.find(x=>x)||"");render()}});
+/* ===== 啟動 ===== */
+const step=t=>{app.innerHTML=`<p class="sm2" style="padding:40px 0;text-align:center">${esc(t)}</p>`};
+(async function init(){
+S.coachMode=/role(=|%3D)coach/.test(location.href);
+if(CONFIG.LIFF_ID){
+try{
+if(typeof liff==="undefined")throw new Error("LINE LIFF SDK 載入失敗，請檢查網路後重試");
+step("連線 LINE…");
+await Promise.race([liff.init({liffId:CONFIG.LIFF_ID}),new Promise((_,rej)=>setTimeout(()=>rej(new Error("LIFF 初始化逾時，請確認 LIFF Endpoint URL 與網址相符")),10000))]);
+if(!liff.isLoggedIn()){liff.login();return}
+step("取得使用者資料…");
+const p=await liff.getProfile();S.uid=p.userId;S.lineName=p.displayName;
+}catch(err){console.error(err);app.innerHTML=`<h1>無法開啟</h1><p class="sm2">LINE 登入初始化失敗：</p><p class="sm2">${esc(err.message||err)}</p>`;return}
+}
+if(!S.uid)S.uid=new URLSearchParams(location.search).get("uid")||localStorage.cb_uid||(localStorage.cb_uid="U"+rid());
+step("載入畫面…");
+render();
+})();
+</script>
 </body>
 </html>
